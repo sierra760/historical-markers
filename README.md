@@ -33,7 +33,7 @@ In addition to the state of Nevada, the developer will soon be extending this co
 Users interested in versions of this app for other states or locations are encouraged to use this codebase as a template to create their own applications.
 ## Screenshots
 
-![Viewing Markers on a Map](/screenshots/mapview.jpg') ![Viewing Markers in a List](/screenshots/listview.jpg') ![Viewing an Individual Marker's Content](/screenshots/detailview.jpg')
+![Viewing Markers on a Map](screenshots/mapview.jpg?raw=true' "Viewing Markers on a Map") ![Viewing Markers in a List](screenshots/listview.jpg?raw=true' "Viewing Markers in a List") ![Viewing an Individual Marker's Content](screenshots/detailview.jpg?raw=true' "Viewing an Individual Marker's Content")
 
 
 ## Installation
@@ -51,6 +51,13 @@ Then, use expo to install dependencies:
 
 ```bash
 npx expo install
+```
+
+Finally, as noted earlier in this document, this project's source code is not bundled with historical marker content as this content is not owned by the developer.  This repository hosts some very basic sample data containing the JSON data for one historical marker.  To ensure that this sample data is loaded when launching the app, you will need to rename "markers_sample.json" to "markers.json", and the directory "photos_compressed_sample" to "photos_compressed" using the following commands (to be executed from the project directory):
+
+```bash
+mv assets/nevada/markers_sample.json assets/nevada/markers.json
+mv assets/nevada/photos_compressed_sample assets/nevada/photos_compressed
 ```
 
 You can then run the app on iOS or Android simulators and/or devices by executing the following command to launch Expo's server and Metro Builder:
