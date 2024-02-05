@@ -63,6 +63,9 @@ export default class MarkerFilterHeader extends React.Component {
 						style={{...filterSelectStyles,
 							inputIOSContainer: {
 								width: win.width - filterSelectStyles.inputIOSContainer.width - filterSelectStyles.inputIOS.paddingHorizontal * 2 - 30
+							},
+							inputAndroidContainer: {
+								width: win.width - filterSelectStyles.inputIOSContainer.width - filterSelectStyles.inputIOS.paddingHorizontal * 2 - 5
 							}
 						}}
 						onValueChange={(value) => this.changeFilter("county", value)}

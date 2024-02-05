@@ -164,7 +164,6 @@ export const styles = StyleSheet.create({
 		lineHeight: 26,
 		color: theme.bodyText,
 		fontFamily: theme.bodyFont,
-		fontWeight: "bold",
 	},
 	modalImageSubcaption: {
 		marginBottom: 5,
@@ -277,7 +276,6 @@ export const styles = StyleSheet.create({
 		marginBottom: 15,
 	},
 	modalHeading: {
-		fontWeight: "bold",
 		fontSize: 18,
 		marginBottom: 10,
 		textAlign: "left",
@@ -363,6 +361,9 @@ export const filterSelectStyles = StyleSheet.create({
   inputIOSContainer: {
   	width: 140
   },
+  inputAndroidContainer: {
+  	width: 120
+  },
   inputIOS: {
   	backgroundColor: theme.primaryBackgroundDarkest,
     fontSize: 16,
@@ -374,13 +375,14 @@ export const filterSelectStyles = StyleSheet.create({
     paddingRight: 30,
   },
   inputAndroid: {
+    backgroundColor: theme.primaryBackgroundDarkest,
     fontSize: 16,
+    lineHeight: 16,
+	color: theme.lightOnBackground,
+	fontFamily: theme.subheaderFont,
+    paddingVertical: 10,
     paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: 'purple',
-    borderRadius: 8,
-    color: 'black',
+    borderRadius: 16,
     paddingRight: 30,
   },
   iconContainer: {
