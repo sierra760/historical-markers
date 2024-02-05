@@ -50,7 +50,7 @@ cd historical-markers
 Then, use expo to install dependencies:
 
 ```bash
-npx expo install
+npm install
 ```
 
 Finally, as noted earlier in this document, this project's source code is not bundled with historical marker content as this content is not owned by the developer.  This repository hosts some very basic sample data containing the JSON data for one historical marker.  To ensure that this sample data is loaded when launching the app, you will need to rename "markers_sample.json" to "markers.json", and the directory "photos_compressed_sample" to "photos_compressed" using the following commands (to be executed from the project directory):
