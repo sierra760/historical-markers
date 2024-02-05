@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Nevada Historical Markers",
+    "slug": "historicalmarkers-nv",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/nevada/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/nevada/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#519fbb"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "buildNumber": "2",
+      "bundleIdentifier": "com.sierraburkhart.historicalmarkers.nevada",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDisplayName": "NV History",
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/nevada/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/nevada/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2c6a48df-b189-478a-9294-aa17cf4ce31d"
+      }
+    },
+    "plugins": [
+    	["expo-location",
+			{
+			  "locationWhenInUsePermission": "If you allow Nevada Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+			  "locationAlwaysAndWhenInUsePermission": "If you allow Nevada Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+			  "isIosBackgroundLocationEnabled": false,
+			  "isAndroidBackgroundLocationEnabled": false
+			}
+		]
+    ]
+  }
+}
