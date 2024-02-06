@@ -18,19 +18,24 @@ Note that while this app is and always will be FOSS, the textual and graphical c
 
 The developer plans the following improvements for the app's next minor version:
 
+- Refactor to avoid use of global variables (I know, don't judge me)
 - Conduct testing on Android devices and correct any related issues
 - General code audit and clean-up to reflect best practices of React Native development (this is the developer's first solo mobile app and the current codebase is disorganized and probably violates a bunch of optimal practices for using React Native)
 - Refactor code to allow for more straightforward creation of additional regional variants (i.e., historical markers within other states aside from Nevada)
 
-In addition to the state of Nevada, the developer will soon be extending this codebase to release applications for historical markers in the following U.S. states:
+In addition to the state of Nevada, the developer will soon (likely within weeks) be extending this codebase to release applications for historical markers in the following U.S. states:
 
-- New Mexico
-- California
-- Arizona
+- New Mexico (next)
+- California (would be next, but data collection is much more involved)
+
+And in no particular order, the developer also plans to release the following states in the near future:
+
 - Colorado
+- Arizona
 - Montana
 
 Users interested in versions of this app for other states or locations are encouraged to use this codebase as a template to create their own applications.
+
 ## Screenshots
 
 ![Viewing Markers on a Map](screenshots/mapview.jpg?raw=true' "Viewing Markers on a Map") ![Viewing Markers in a List](screenshots/listview.jpg?raw=true' "Viewing Markers in a List") ![Viewing an Individual Marker's Content](screenshots/detailview.jpg?raw=true' "Viewing an Individual Marker's Content")
@@ -60,7 +65,7 @@ mv assets/nevada/markers_sample.json assets/nevada/markers.json
 mv assets/nevada/photos_compressed_sample assets/nevada/photos_compressed
 ```
 
-You can then run the app on iOS or Android simulators and/or devices by executing the following command to launch Expo's server and Metro Builder:
+You can then run the app on iOS or Android simulators and/or devices by executing the following command to launch Expo's app server and Metro Builder:
 
 ```bash
 npx expo start
