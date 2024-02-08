@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
-// See full license text in file "LICENSE" at root of directory
+// See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
 import {
@@ -19,7 +19,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import MarkerFilterHeader from "./MarkerFilterHeader";
 import { sortArrayofObjects, formatDistance, haversine, fulfillWithTimeLimit } from "./utils";
-import { styles, theme } from "./styles";
+import { styles } from "./styles";
+import { region, theme } from "./regions";
 
 export default class MarkerListView extends Component {
 	constructor(props) {

@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
-// See full license text in file "LICENSE" at root of directory
+// See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
 import { DeviceEventEmitter, Appearance } from "react-native";
@@ -24,8 +24,13 @@ import MarkerListView from "./src/MarkerListView";
 import MarkerMapView from "./src/MarkerMapView";
 import MarkerDetailView from "./src/MarkerDetailView";
 import MarkerFilterHeader from "./src/MarkerFilterHeader";
-import { styles, theme } from "./src/styles";
+import { styles } from "./src/styles";
 import { importAll, haversine, sortArrayofObjects, getBoundingBox, fulfillWithTimeLimit } from "./src/utils";
+
+// STATE/REGION CONFIGURATION
+// To change the app's state/region, edit the string literal on line 2 of the file imported below
+// Make sure also to rename app-**.json (where ** is the abbreviation of your region) to app.json before running or building
+import { region, theme } from "./src/regions";
 
 // Prevent splash screen from hiding until app setup has completed
 SplashScreen.preventAutoHideAsync();
@@ -94,9 +99,9 @@ export default class App extends React.Component {
 	};
 
 	loadData = async() => {
-		const markers = require("./assets/nevada/markers.json");
+		const markers = require("./assets/current/markers.json");
 		const images = importAll(
-			require.context("./assets/nevada/photos_compressed"),
+			require.context("./assets/current/photos_compressed"),
 		);
 		let { status } = await Location.requestForegroundPermissionsAsync();
 		if (status !== "granted") {
@@ -177,6 +182,7 @@ export default class App extends React.Component {
 		return (
 			<Tab.Navigator
 				screenOptions={{
+					tabBarActiveTintColor: theme.activeTabBackground,
 					headerShown: false,
 					unmountOnBlur: true,
 				}}
@@ -262,6 +268,9 @@ export default class App extends React.Component {
 					fontSize: 20,
 				},
 				headerBackTitle: "Back",
+				headerBackTitleStyle: {
+					fontFamily: theme.headerFont
+				}
 			};
 			SplashScreen.hideAsync();
 			return (
@@ -272,7 +281,7 @@ export default class App extends React.Component {
 				>
 					<RootStack.Navigator>
 						<RootStack.Screen
-							name="Nevada Historical Markers"
+							name={`${region.name} Historical Markers`}
 							component={this.HomeTabs}
 							options={headerStyles}
 						/>

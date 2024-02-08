@@ -1,61 +1,11 @@
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
-// See full license text in file "LICENSE" at root of directory
+// See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
-import { StyleSheet, Appearance } from "react-native";
+import { StyleSheet } from "react-native";
 
-const selectedTheme = Appearance.getColorScheme();
-
-const themes = {
-	light: {
-		primaryBackground: "#005a9c",
-		primaryBackgroundDarker: "#004b83",
-		primaryBackgroundDarkest: "#003d69",
-		primaryBackgroundLighter: "#0069b6",
-		primaryBackgroundLightest: "#0086e9",
-		lightOnBackground: "#aed1ea",
-		lighterOnBackground: "#d6e8f5",
-		contrastOnBackground: "#ffffff",
-		splashBackground: "#519fbb",
-		listBackground: "#ffffff",
-		headerFont: "Rye",
-		subheaderFont: "AsapCondensed",
-		bodyFont: "EBGaramond",
-		bodyHighlight: "#888888",
-		bodyHeader: "#666666",
-		bodyText: "#444444",
-		bodyDark: "#222222",
-		highlightedRow: "#dfedf7",
-		separatorColor: "#CED0CE",
-		modalHeader: "#666666",
-	},
-	dark: {
-		primaryBackground: "#005a9c",
-		primaryBackgroundDarker: "#004b83",
-		primaryBackgroundDarkest: "#003d69",
-		primaryBackgroundLighter: "#0069b6",
-		primaryBackgroundLightest: "#0086e9",
-		lightOnBackground: "#aed1ea",
-		lighterOnBackground: "#d6e8f5",
-		contrastOnBackground: "#ffffff",
-		splashBackground: "#519fbb",
-		listBackground: "#333333",
-		headerFont: "Rye",
-		subheaderFont: "AsapCondensed",
-		bodyFont: "EBGaramond",
-		bodyHighlight: "#ababab",
-		bodyHeader: "#666666",
-		bodyText: "#eeeeee",
-		bodyDark: "#efefef",
-		highlightedRow: "#666666",
-		separatorColor: "#666666",
-		modalBackground: "#444444",
-		modalHeader: "#aaaaaa"
-	}
-};
-
-export const theme = themes[selectedTheme];
+import { theme } from "./regions";
 
 export const styles = StyleSheet.create({
 	map: { height: "100%" },
@@ -232,7 +182,7 @@ export const styles = StyleSheet.create({
 		fontSize: 18,
 		lineHeight: 28,
 		marginTop: 15,
-		color: theme.contrastOnBackground,
+		color: theme.contrastOnSplashBackground,
 		fontFamily: theme.bodyFont,
 	},
 	aboutLink: {
@@ -241,7 +191,7 @@ export const styles = StyleSheet.create({
 		textDecorationLine: "underline",
 		lineHeight: 28,
 		marginTop: 15,
-		color: theme.contrastOnBackground,
+		color: theme.contrastOnSplashBackground,
 		fontFamily: theme.bodyFont,
 	},
 	aboutHeading: {
@@ -250,7 +200,7 @@ export const styles = StyleSheet.create({
 		textAlign: "left",
 		marginTop: 25,
 		textTransform: "uppercase",
-		color: theme.lighterOnBackground,
+		color: theme.contrastOnSplashBackground,
 		fontFamily: theme.headerFont,
 	},
 	aboutImageBox: {
@@ -259,15 +209,15 @@ export const styles = StyleSheet.create({
 		paddingBottom: 30,
 		marginBottom: 10,
 		borderTopWidth: 1,
-		borderTopColor: theme.lighterOnBackground,
+		borderTopColor: theme.contrastOnSplashBackground,
 		borderBottomWidth: 1,
-		borderBottomColor: theme.lighterOnBackground,
+		borderBottomColor: theme.contrastOnSplashBackground,
 	},
 	aboutImageCaption: {
 		marginTop: 10,
 		textAlign: "left",
 		fontSize: 16,
-		color: theme.lighterOnBackground,
+		color: theme.contrastOnSplashBackground,
 		fontFamily: theme.bodyFont,
 	},
 	modalTitle: {
@@ -327,7 +277,7 @@ export const styles = StyleSheet.create({
 		fontSize: 16,
 	},
 	searchLeftIconContainerStyle: {
-		color: theme.lightOnBackground,
+		tintColor: theme.lightOnBackground,
 	},
 	searchContainer: {
 		backgroundColor: theme.primaryBackgroundDarker,

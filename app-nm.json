@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "New Mexico Historical Markers",
+    "slug": "historicalmarkers-nm",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/nm/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/nm/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#b1bfae"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "buildNumber": "1",
+      "bundleIdentifier": "com.sierraburkhart.historicalmarkers.new-mexico",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDisplayName": "NM History"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/nm/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sierraburkhart.historicalmarkers.new-mexico",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/nm/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "If you allow New Mexico Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+          "locationAlwaysAndWhenInUsePermission": "If you allow New Mexico Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "caf1a8a0-965b-4998-b4fd-bdb174323dd5"
+      }
+    }
+  }
+}

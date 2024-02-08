@@ -1,11 +1,12 @@
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
-// See full license text in file "LICENSE" at root of directory
+// See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
 import { ScrollView, View, Image, Text, Dimensions, Linking } from "react-native";
 
-import { styles, theme } from "./styles";
+import { region, theme } from "./regions";
+import { styles } from "./styles";
 
 export default class SettingsView extends React.Component {
 	render() {
@@ -15,14 +16,14 @@ export default class SettingsView extends React.Component {
 				<Image
 					style={{
 						width: win.width,
-						height: win.width * 0.912109375,
+						height: win.width * region.aboutSplashWidth,
 					}}
-					source={require("../assets/nevada/splash-small.png")}
+					source={require("../assets/current/splash-small.png")}
 				/>
 				<View style={styles.aboutTextContainer}>
 					<Text style={styles.aboutHeading}>About This App</Text>
-					<Text style={styles.aboutText}>Nevada Historical Markers is a free app that allows you to locate and learn about the nearly one thousand historical markers that have been placed throughout the U.S. state of Nevada. Historical markers serve as tangible links to the past, providing educational insights about historical events, figures, and places. By reading these markers, you can learn many things about Nevada history, including about significant events that occurred throughout the state's history and notable individuals associated with the state.</Text>
-					<Text style={styles.aboutText}>This app is meant to be a travel companion as you explore the the state of Nevada, as well as an educational tool. You can explore historical markers in a list or on a map, and by tapping on any marker's title, you can view the marker's inscription and location, and oftentimes even see several photos of the marker and its surrounding location. Markers can be filtered by name, county, and whether you have saved the marker as one of your favorites.</Text>
+					<Text style={styles.aboutText}>{region.name} Historical Markers is a free app that allows you to locate and learn about the nearly one thousand historical markers that have been placed throughout the U.S. state of {region.name}. Historical markers serve as tangible links to the past, providing educational insights about historical events, figures, and places. By reading these markers, you can learn many things about {region.name} history, including about significant events that occurred throughout the state's history and notable individuals associated with the state.</Text>
+					<Text style={styles.aboutText}>This app is meant to be a travel companion as you explore the the state of {region.name}, as well as an educational tool. You can explore historical markers in a list or on a map, and by tapping on any marker's title, you can view the marker's inscription and location, and oftentimes even see several photos of the marker and its surrounding location. Markers can be filtered by name, county, and whether you have saved the marker as one of your favorites.</Text>
 					<Text style={styles.aboutText}>The vast majority of the information about the historical markers in this app was derived from The Historical Marker Database (HMdb.org) under the terms of the HMdb.org content license. Marker information and images posted to HMdb.org are the property of HMdb.org and/or the users who contributed content to that website. Users must be aware that the developer has not verified the accuracy or quality of information obtained from external sources, and the developer is not responsible for any aspect of content created and/or owned by other parties, including but not limited to inaccuracies, errors, and omissions.</Text>
 					<Text style={styles.aboutLink} onPress={() => Linking.openURL("https://www.hmdb.org/copyright.asp")}>
 						Most of the content presented within this app is being used under the terms of the copyright license posted by the Historical Marker Database (HMdb.org). More information about HMdb.org's content ownership and copyright policy can be found here.
@@ -31,12 +32,12 @@ export default class SettingsView extends React.Component {
 					</Text>
 					<Text style={styles.aboutLink} onPress={() => Linking.openURL("https://openfontlicense.org/documents/OFL.txt")}>Tap here to view the full text of the SIL Open Font license that governs the use of the bundled fonts.  The idential full text of the SIL license also accompanies the font files in this application's GitHub repository.
 					</Text>
-					<Text style={styles.aboutText}>Given that cellular service remains sparse in many parts of rural Nevada, the app is designed to be fully functional even without a cellular signal or Internet connection. All marker content and images are stored on your device and will remain accessible even if your device is offline, but maps may be less detailed or hidden altogether while your device is offline.</Text>
-					<Text style={styles.aboutText}>Nevada Historical Markers is the first in a series of state historical marker applications developed by Dr. Sierra Burkhart, Nevada history enthusiast and the Academic Director of UCLA Geospatial. This app is and always will be free to use, and its source code is available for download on Github.</Text>
+					<Text style={styles.aboutText}>Given that cellular service remains sparse in many parts of rural {region.name}, the app is designed to be fully functional even without a cellular signal or Internet connection. All marker content and images are stored on your device and will remain accessible even if your device is offline, but maps may be less detailed or hidden altogether while your device is offline.</Text>
+					<Text style={styles.aboutText}>{region.name} Historical Markers is the first in a series of state historical marker applications developed by Dr. Sierra Burkhart, {region.name} history enthusiast and the Academic Director of UCLA Geospatial. This app is and always will be free to use, and its source code is available for download on Github.</Text>
 					<Text style={styles.aboutLink} onPress={() => Linking.openURL("mailto:sierra@sierraburkhart.com")}>
 						Please feel free to contact the developer to share any comments, ideas, corrections, or bug reports: sierra@sierraburkhart.com
 					</Text>
-					<Text style={styles.aboutText}>Enjoy, and happy travels throughout the beautiful Silver State!</Text>
+					<Text style={styles.aboutText}>Enjoy, and happy travels throughout the beautiful {region.nickname}!</Text>
 					<View style={styles.aboutImageBox}>
 						<Image
 							style={{
@@ -55,12 +56,12 @@ export default class SettingsView extends React.Component {
 											2) /
 									0.75,
 							}}
-							source={require('../assets/nevada/developer.jpg')}
+							source={require('../assets/current/developer.jpg')}
 							resizeMethod="resize"
 							resizeMode="contain"
 						/>
 						<Text style={styles.aboutImageCaption}>
-							Your developer while touring the Historic Fourth Ward School Museum in Virginia City, Storey County.
+							{region.developerImageCaption}
 						</Text>
 				</View>
 					<Text style={styles.aboutHeading}>Terms of Use</Text>

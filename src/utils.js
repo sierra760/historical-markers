@@ -1,6 +1,8 @@
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
-// See full license text in file "LICENSE" at root of directory
+// See full license text in file "LICENSE" at root of project directory
+
+import { region } from "./regions";
 
 function toRad(x) { return (x * Math.PI) / 180; }
 function toDeg(x) { return (x * 180) / Math.PI; }
@@ -60,7 +62,7 @@ export const formatDistance = (distance) => {
 }
 
 export const getBbox = (features) => {
-	const statewide = {lat_min: 34.5, lat_max: 42.5, lon_min: -121.0, lon_max: -112.0}
+	const statewide = region.statewideMapExtent;
 	let bbox = { lat_min: 90.0, lat_max: -90.0, lon_min: 180.0, lon_max: -180.0 };
 	features.forEach((feature) => {
 		if (feature.geometry.coordinates[0] <= bbox.lon_min) bbox.lon_min = feature.geometry.coordinates[0];
@@ -96,7 +98,7 @@ export const bboxToRegion = (bbox) => {
 export const importAll = (r) => {
 	let images = {};
 	r.keys().map((item, index) => {
-		images[item.replace("./", "")] = r(item);
+		images[item.replace(/^.*[\\/]/, '')] = r(item);
 	});
 	return images;
 }

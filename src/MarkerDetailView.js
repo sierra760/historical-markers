@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
-// See full license text in file "LICENSE" at root of directory
+// See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
 import {
@@ -21,7 +21,8 @@ import { Ionicons } from "@expo/vector-icons";
 import ImageView from "react-native-image-viewing";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { styles, theme } from "./styles";
+import { styles } from "./styles";
+import { region, theme } from "./regions";
 import { formatDistance, haversine, capitalizeFirstLetter } from "./utils";
 
 export default class MarkerDetailView extends Component {
@@ -38,9 +39,13 @@ export default class MarkerDetailView extends Component {
 		if ((await Speech.isSpeakingAsync()) == true) this.stopSpeaking();
 		else {
 			this.setState({ speechButtonLabel: "Stop Speaking" });
-			// Because iOS voices can't pronounce "Nevada" correctly without assistance :'( ...
-			Speech.speak(title.replaceAll("Nevada", "Nevadda"));
-			Speech.speak(description.replaceAll("Nevada", "Nevadda"), {
+			if (region.name == "Nevada") {
+				// Because iOS voices can't pronounce "Nevada" correctly without assistance :'( ...
+				title = title.replaceAll("Nevada", "Nevadda");
+				description = description.replaceAll("Nevada", "Nevadda");
+			}
+			Speech.speak(title);
+			Speech.speak(description, {
 				onDone: () => this.stopSpeaking(),
 			});
 		}
@@ -203,7 +208,7 @@ export default class MarkerDetailView extends Component {
 							<Button
 								titleStyle={styles.buttonTitle}
 								style={styles.buttonLeft}
-								color="#005a9c"
+								color={theme.primaryBackground}
 								icon={{
 									name: "directions",
 									size: 20,
@@ -221,7 +226,7 @@ export default class MarkerDetailView extends Component {
 						<View style={styles.buttonContainer}>
 							<Button
 								titleStyle={styles.buttonTitle}
-								color="#005a9c"
+								color={theme.primaryBackground}
 								icon={{
 									name: "multitrack-audio",
 									size: 20,

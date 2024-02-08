@@ -37,5 +37,7 @@ yarn-error.*
 
 # proprietary assets
 assets_original/
-assets/nevada/photos_compressed/
-assets/nevada/markers.json
+assets/nv/photos_compressed/
+assets/nv/markers.json
+assets/nm/photos_compressed/
+assets/nm/markers.json

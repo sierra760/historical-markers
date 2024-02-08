@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
-// See full license text in file "LICENSE" at root of directory
+// See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
 import { View, Text, Dimensions, DeviceEventEmitter } from "react-native";
@@ -9,7 +9,8 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import RNPickerSelect from 'react-native-picker-select';
 
-import { styles, theme, filterSelectStyles } from "./styles";
+import { styles, filterSelectStyles } from "./styles";
+import { region, theme } from "./regions";
 
 export default class MarkerFilterHeader extends React.Component {
 	changeFilter = (f, value) => {
@@ -33,9 +34,10 @@ export default class MarkerFilterHeader extends React.Component {
 					containerStyle={styles.searchContainer}
 					inputContainerStyle={styles.searchInputContainer}
 					inputStyle={styles.searchInputStyle}
-					leftIconContainerStyle={styles.searchLeftIconContainerStyle}
+					searchIcon={() => {
+						return <Ionicons name="search-outline" size={16} color={theme.lightOnBackground} />;
+					}}
 					placeholderTextColor={theme.lightOnBackground}
-					leftIconColor={theme.lightOnBackground}
 					round
 					onChangeText={(text) => this.changeFilter("search", text)}
 					autoCorrect={false}
@@ -54,7 +56,7 @@ export default class MarkerFilterHeader extends React.Component {
 						]}
 						useNativeAndroidPickerStyle={false}
 						Icon={() => {
-							return <Ionicons name="chevron-down-outline" size={16} color={theme.lighterOnBackground} />;
+							return <Ionicons name="chevron-down-outline" size={16} color={theme.lightOnBackground} />;
 						}}
 					/>
 					<Text style={styles.filterWrapperCaption}> in </Text>
@@ -73,7 +75,7 @@ export default class MarkerFilterHeader extends React.Component {
 						items={global.counties}
 						useNativeAndroidPickerStyle={false}
 						Icon={() => {
-							return <Ionicons name="chevron-down-outline" size={16} color={theme.lighterOnBackground} />;
+							return <Ionicons name="chevron-down-outline" size={16} color={theme.lightOnBackground} />;
 						}}
 					/>
 				</View>

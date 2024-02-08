@@ -3,7 +3,7 @@
 
 Nevada Historical Markers is a free and open source software (FOSS) mobile application that serves as an interactive guide to the nearly 1,000 historical markers located throughout the Silver State.
 
-This application is build with Expo and React Native and is currently optimized for iOS (both iPhone and iPad).  Android is also supported, though the developer has not yet conducted extensive testing of an Android build.
+This application is built with Expo and React Native and is optimized for iOS (both iPhone and iPad).  Android is also supported, though the developer has not yet conducted extensive testing of an Android build.
 
 Note that while this app is and always will be FOSS, the textual and graphical content used in the published version of the application is mostly owned by the Historial Marker Database (HMdb.org) and its contributors.  The source code in this repository is therefore distributed *without* the app's complete content; sample content is included for the purpose of demonstrating functionality and data structures.
 
