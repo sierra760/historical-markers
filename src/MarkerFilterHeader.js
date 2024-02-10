@@ -35,9 +35,9 @@ export default class MarkerFilterHeader extends React.Component {
 					inputContainerStyle={styles.searchInputContainer}
 					inputStyle={styles.searchInputStyle}
 					searchIcon={() => {
-						return <Ionicons name="search-outline" size={16} color={theme.lightOnBackground} />;
+						return <Ionicons name="search-outline" size={16} color={theme.lighterOnBackground} />;
 					}}
-					placeholderTextColor={theme.lightOnBackground}
+					placeholderTextColor={theme.lighterOnBackground}
 					round
 					onChangeText={(text) => this.changeFilter("search", text)}
 					autoCorrect={false}

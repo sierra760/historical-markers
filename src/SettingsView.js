@@ -22,7 +22,7 @@ export default class SettingsView extends React.Component {
 				/>
 				<View style={styles.aboutTextContainer}>
 					<Text style={styles.aboutHeading}>About This App</Text>
-					<Text style={styles.aboutText}>{region.name} Historical Markers is a free app that allows you to locate and learn about the nearly one thousand historical markers that have been placed throughout the U.S. state of {region.name}. Historical markers serve as tangible links to the past, providing educational insights about historical events, figures, and places. By reading these markers, you can learn many things about {region.name} history, including about significant events that occurred throughout the state's history and notable individuals associated with the state.</Text>
+					<Text style={styles.aboutText}>{region.name} Historical Markers is a free app that allows you to locate and learn about the many historical markers that have been placed throughout the U.S. state of {region.name}. Historical markers serve as tangible links to the past, providing educational insights about historical events, figures, and places. By reading these markers, you can learn many things about {region.name} history, including about significant events that occurred throughout the state's history and notable individuals associated with the state.</Text>
 					<Text style={styles.aboutText}>This app is meant to be a travel companion as you explore the the state of {region.name}, as well as an educational tool. You can explore historical markers in a list or on a map, and by tapping on any marker's title, you can view the marker's inscription and location, and oftentimes even see several photos of the marker and its surrounding location. Markers can be filtered by name, county, and whether you have saved the marker as one of your favorites.</Text>
 					<Text style={styles.aboutText}>The vast majority of the information about the historical markers in this app was derived from The Historical Marker Database (HMdb.org) under the terms of the HMdb.org content license. Marker information and images posted to HMdb.org are the property of HMdb.org and/or the users who contributed content to that website. Users must be aware that the developer has not verified the accuracy or quality of information obtained from external sources, and the developer is not responsible for any aspect of content created and/or owned by other parties, including but not limited to inaccuracies, errors, and omissions.</Text>
 					<Text style={styles.aboutLink} onPress={() => Linking.openURL("https://www.hmdb.org/copyright.asp")}>
@@ -38,32 +38,6 @@ export default class SettingsView extends React.Component {
 						Please feel free to contact the developer to share any comments, ideas, corrections, or bug reports: sierra@sierraburkhart.com
 					</Text>
 					<Text style={styles.aboutText}>Enjoy, and happy travels throughout the beautiful {region.nickname}!</Text>
-					<View style={styles.aboutImageBox}>
-						<Image
-							style={{
-								borderRadius: 16,
-								width: win.width -
-									styles.aboutTextContainer.marginLeft -
-									styles.aboutTextContainer.marginRight -
-									styles.aboutTextContainer.padding * 2,
-								height:
-									(win.width -
-										styles.aboutTextContainer
-											.marginLeft -
-										styles.aboutTextContainer
-											.marginRight -
-										styles.aboutTextContainer.padding *
-											2) /
-									0.75,
-							}}
-							source={require('../assets/current/developer.jpg')}
-							resizeMethod="resize"
-							resizeMode="contain"
-						/>
-						<Text style={styles.aboutImageCaption}>
-							{region.developerImageCaption}
-						</Text>
-				</View>
 					<Text style={styles.aboutHeading}>Terms of Use</Text>
 					<Text style={styles.aboutText}>Owing to the licensing of content contained within the application, nearly all of which has been derived from the Historical Markers Database (HMdb.org), commercial use of the content contained within this application is strictly prohibited. No exceptions to this commercial use prohibition are possible as the marker information and images presented in this application are the property of HMdb.org and its contributors.  The developer is not responsible for any consequences to the user related to the use or misuse of this application, including (but not limited to) any actions taken by the user related to information presented within this application. In other words, by using this application you agree that you are solely responsible for knowing how to safely use this application.</Text>
 					<Text style={styles.aboutText}>The source code of this application, excluding all historical marker content which is the property of HMdb.org and its contributors, is licensed using the GNU General Public License version 3 (GPLv3) to ensure that it and any derivative products remain free and open-source software (FOSS).  This license choice reflects a commitment to the principles of open collaboration and the protection of user freedoms.</Text>

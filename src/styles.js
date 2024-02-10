@@ -141,6 +141,7 @@ export const styles = StyleSheet.create({
 	buttonTitle: {
 		fontFamily: theme.subheaderFont,
 		textTransform: "uppercase",
+		color: theme.lighterOnBackground
 	},
 	modalTextContainer: {
 		padding: 15,
@@ -253,7 +254,7 @@ export const styles = StyleSheet.create({
 		flex: 1,
 	},
 	buttonLeft: {
-		borderRightColor: theme.contrastOnBackground,
+		borderRightColor: theme.lighterOnBackground,
 		borderRightWidth: 1,
 		marginLeft: -30
 	},
@@ -271,13 +272,13 @@ export const styles = StyleSheet.create({
 		paddingBottom: 10,
 	},
 	filterWrapperCaption: {
-		color: theme.lightOnBackground,
+		color: theme.lighterOnBackground,
 		margin: 5,
 		fontFamily: theme.subheaderFont,
 		fontSize: 16,
 	},
 	searchLeftIconContainerStyle: {
-		tintColor: theme.lightOnBackground,
+		tintColor: theme.lighterOnBackground,
 	},
 	searchContainer: {
 		backgroundColor: theme.primaryBackgroundDarker,
@@ -288,7 +289,7 @@ export const styles = StyleSheet.create({
 		backgroundColor: theme.primaryBackgroundDarkest,
 	},
 	searchInputStyle: {
-		color: theme.lightOnBackground,
+		color: theme.buttonTitle,
 		fontFamily: theme.subheaderFont,
 	},
 	emptyList: {
@@ -317,7 +318,7 @@ export const filterSelectStyles = StyleSheet.create({
   inputIOS: {
   	backgroundColor: theme.primaryBackgroundDarkest,
     fontSize: 16,
-	color: theme.lightOnBackground,
+	color: theme.lighterOnBackground,
 	fontFamily: theme.subheaderFont,
     paddingVertical: 12,
     paddingHorizontal: 10,
@@ -328,7 +329,7 @@ export const filterSelectStyles = StyleSheet.create({
     backgroundColor: theme.primaryBackgroundDarkest,
     fontSize: 16,
     lineHeight: 16,
-	color: theme.lightOnBackground,
+	color: theme.lighterOnBackground,
 	fontFamily: theme.subheaderFont,
     paddingVertical: 10,
     paddingHorizontal: 10,

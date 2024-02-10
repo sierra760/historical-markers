@@ -36,8 +36,13 @@ yarn-error.*
 *.tsbuildinfo
 
 # proprietary assets
+retrieval/
 assets_original/
 assets/nv/photos_compressed/
 assets/nv/markers.json
 assets/nm/photos_compressed/
 assets/nm/markers.json
+assets/co/photos_compressed/
+assets/co/markers.json
+assets/az/photos_compressed/
+assets/az/markers.json

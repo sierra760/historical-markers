@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "Colorado Historical Markers",
+    "slug": "historicalmarkers-co",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/co/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/co/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff4dc"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "buildNumber": "1",
+      "bundleIdentifier": "com.sierraburkhart.historicalmarkers.colorado",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDisplayName": "CO History"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/co/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sierraburkhart.historicalmarkers.colorado",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/co/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "If you allow Colorado Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+          "locationAlwaysAndWhenInUsePermission": "If you allow Colorado Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7bd2cc04-9725-4b21-b008-1b0e998db7fb"
+      }
+    }
+  }
+}

@@ -212,7 +212,7 @@ export default class MarkerDetailView extends Component {
 								icon={{
 									name: "directions",
 									size: 20,
-									color: "#fff",
+									color: theme.lighterOnBackground,
 								}}
 								title="View in Maps"
 								onPress={() =>
@@ -230,7 +230,7 @@ export default class MarkerDetailView extends Component {
 								icon={{
 									name: "multitrack-audio",
 									size: 20,
-									color: "#fff",
+									color: theme.lighterOnBackground,
 								}}
 								title={this.state.speechButtonLabel}
 								onPress={() =>
