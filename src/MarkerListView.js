@@ -12,7 +12,6 @@ import {
 	DeviceEventEmitter
 } from "react-native";
 import { ListItem } from "@rneui/base";
-import * as Location from "expo-location";
 import { useNavigation, NavigationContainer } from "@react-navigation/native";
 import { Button } from "@rneui/base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,7 +33,6 @@ export default class MarkerListView extends Component {
 
 	applyFilter = () => {
 		this.setState({ data: global.data });
-		this.sortByLocation();
 	};
 	
 	updateFromDetailView = () => {
@@ -54,53 +52,14 @@ export default class MarkerListView extends Component {
 	
 	callRefreshControl = () => {
 		this.setState({ refreshing: true });
-		this.sortByLocation();
-	};
-
-	sortByLocation = async () => {
-		let { status } = await Location.requestForegroundPermissionsAsync();
-		if (status !== "granted") {
-			global.location_permission = false;
-			this.setState({ location: false });
-			return;
-		} else {
-			global.location_permission = true;
-			let loc = await fulfillWithTimeLimit(10000,Location.getCurrentPositionAsync({}),false);
-			if (loc != false) {
-				if (global.location == false) {
-					global.data_clean.forEach((feature) => {
-						let {d, b, bv} = haversine(
-							[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-							[loc.coords.longitude, loc.coords.latitude],
-						);
-						feature.properties.distance = d;
-						feature.properties.bearing = b;
-						feature.properties.bearing_verbose = bv;
-					});
-					global.data_clean.sort(sortArrayofObjects("distance", "asc"));
-				}
-				global.data.forEach((feature) => {
-					let {d, b, bv} = haversine(
-						[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-						[loc.coords.longitude, loc.coords.latitude],
-					);
-					feature.properties.distance = d;
-					feature.properties.bearing = b;
-					feature.properties.bearing_verbose = bv;
-				});
-				global.data.sort(sortArrayofObjects("distance", "asc"));
-				global.location = [loc.coords.longitude, loc.coords.latitude];
-				this.setState({ data: global.data, refreshing: false  });
-			}
-			else {
-				this.state.data.sort(sortArrayofObjects("title", "asc"));
-				global.location = false;
-				this.setState({ data: global.data, location: false, refreshing: false });
-			}
-		}
+		DeviceEventEmitter.emit("event.updateLocation");
+		this.setState({ refreshing: false });
 	};
 
 	async componentDidMount() {
+		DeviceEventEmitter.addListener("event.locationUpdated", () => {
+			this.applyFilter();
+		});
 		this.applyFilter();
 	}
 
@@ -140,7 +99,7 @@ export default class MarkerListView extends Component {
 		let subtitle = item.properties.county;
 		let distance = Number(item.properties.distance);
 		let unit = "miles";
-		if (global.location != false) {
+		if (global.location != false && global.location != null && global.location != true) {
 			renderedDistance = formatDistance(distance);
 			subtitle = `${subtitle}   |   ${renderedDistance} ${item.properties.bearing}`;
 		}

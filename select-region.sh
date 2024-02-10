@@ -13,7 +13,7 @@ else
 	cd ./assets
 	unlink ./current
 	ln -s ./"$1" ./current
-	cd ../src
-	firstline="const selectedRegion = '$1';"
-	sed -i "1s/.*/$firstline/" regions.js
+	cd ..
+	rm app-region.js
+	echo "export const selectedRegion = '$1';" > app-region.js
 fi

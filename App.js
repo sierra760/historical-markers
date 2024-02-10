@@ -48,7 +48,7 @@ global.counties = [
 		value: "all",
 	},
 ];
-global.location_permission = false;
+global.location_permission = null;
 global.location = null;
 global.online = null;
 
@@ -103,32 +103,6 @@ export default class App extends React.Component {
 		const images = importAll(
 			require.context("./assets/current/photos_compressed"),
 		);
-		let { status } = await Location.requestForegroundPermissionsAsync();
-		if (status !== "granted") {
-			global.location_permission = false;
-			markers.features.sort(sortArrayofObjects("title", "asc"));
-			global.location = false;
-		} else {
-			global.location_permission = true;
-			let loc = await fulfillWithTimeLimit(10000,Location.getCurrentPositionAsync({}),false);
-			if (loc != false) {
-				markers.features.forEach((feature) => {
-					let {d, b, bv} = haversine(
-						[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-						[loc.coords.longitude, loc.coords.latitude],
-					);
-					feature.properties.distance = d;
-					feature.properties.bearing = b;
-					feature.properties.bearing_verbose = bv;
-				});
-				markers.features.sort(sortArrayofObjects("distance", "asc"));
-				global.location = [loc.coords.longitude, loc.coords.latitude];
-			}
-			else {
-				markers.features.sort(sortArrayofObjects("title", "asc"));
-				global.location = false;
-			}
-		}
 		let counties = [];
 		markers.features.forEach((feature) => {
 			if (!feature.properties.hasOwnProperty("images"))
@@ -148,6 +122,24 @@ export default class App extends React.Component {
 			});
 		});
 		global.data_clean = markers.features;
+		// Handle location permissions and setting up listener
+		let { status } = await Location.requestForegroundPermissionsAsync();
+		if (status !== "granted") {
+			// Location permission not granted
+			global.location_permission = false;
+			global.data_clean.sort(sortArrayofObjects("title", "asc"));
+			global.location = false;
+		} else {
+			// Location permission granted
+			global.location_permission = true;
+			const GEOLOCATION_OPTIONS = { enableHighAccuracy: true, timeout: 30000, maximumAge: 1000, distanceInterval: 100 };
+			Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+			DeviceEventEmitter.addListener("event.updateLocation", () => {
+				this.updateLocation();
+			});
+			this.updateLocation();
+		}
+		
 		this.setState({
 			dataLoaded: true,
 		});
@@ -242,11 +234,37 @@ export default class App extends React.Component {
 			}
 		});
 	};
+	
+	locationChanged = (loc) => {
+		console.log("Location update triggered from callback: ", loc);
+		global.location = [loc.coords.longitude, loc.coords.latitude];
+		global.data_clean.forEach((feature) => {
+			let {d, b, bv} = haversine(
+				[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
+				[loc.coords.longitude, loc.coords.latitude],
+			);
+			feature.properties.distance = d;
+			feature.properties.bearing = b;
+			feature.properties.bearing_verbose = bv;
+		});
+		global.data_clean.sort(sortArrayofObjects("distance", "asc"));
+		DeviceEventEmitter.emit("event.filterData");
+		DeviceEventEmitter.emit("event.locationUpdated");
+	}
+	
+	// Facilitates location on launch and manual location updates (refresh pulldown)
+	updateLocation = async() => {
+		if (global.location == false)
+			loc = await Location.getLastKnownPositionAsync();
+		else
+			loc = await Location.getCurrentPositionAsync();
+		this.locationChanged(loc);
+	}
 
 	componentDidMount() {
 		this.loadConnectivity();
 		this.loadFonts();
-		this.loadFilter();
+		this.loadFilter(); // finished by calling this.loadData()
 	}
 
 	render() {
@@ -255,7 +273,7 @@ export default class App extends React.Component {
 			this.state.dataLoaded &&
 			this.state.filterLoaded &&
 			this.state.deviceConnected != null &&
-			global.location != null
+			global.location_permission != null
 		) {
 			this.filterData();
 			const headerStyles = {

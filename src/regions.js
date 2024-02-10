@@ -1,9 +1,7 @@
-const selectedRegion = 'nm';
-
 // Copyright (c) 2024 Sierra Burkhart
 // License: GNU General Public License version 3 (GPLv3)
 // See full license text in file "LICENSE" at root of project directory
-
+import { selectedRegion } from '../app-region.js'
 import { Appearance } from "react-native";
 
 const selectedTheme = Appearance.getColorScheme();
@@ -71,7 +69,7 @@ const regions = {
 		abbr: "NM",
 		nickname: "Land of Enchantment",
 		statewideMapExtent: {lat_min: 31.3337, lat_max: 36.9982, lon_min: -109.0489, lon_max: -103.0023},
-		aboutSplashWidth: 0.648780487804878,
+		aboutSplashWidth: 0.692032442748092,
 		light: {
 			activeTabBackground: "#3891a4",
 			primaryBackground: "#06768d",
@@ -234,7 +232,7 @@ const regions = {
 		abbr: "AZ",
 		nickname: "Grand Canyon State",
 		statewideMapExtent: {lat_min: 31.3325, lat_max: 37.0004, lon_min: -114.8126, lon_max: -109.0475},
-		aboutSplashWidth: 0.757395038167939,
+		aboutSplashWidth: 0.704914122137405,
 		light: {
 			activeTabBackground: "#9c322f",
 			primaryBackground: "#9c322f",

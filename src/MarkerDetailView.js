@@ -191,6 +191,7 @@ export default class MarkerDetailView extends Component {
 									longitudeDelta: 0.0025,
 								}}
 								scrollEnabled={false}
+								showsPointsOfInterest={false}
 							>
 								<Marker
 									key={this.props.route.params.properties.marker_id}

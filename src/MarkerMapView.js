@@ -48,6 +48,7 @@ export default class MarkerMapView extends React.Component {
 						showsScale={true}
 						tracksViewChanges={true}
 						clusterColor={theme.primaryBackground}
+						showsPointsOfInterest={false}
 						onRegionChange={(region) => {
 							if(region.longitudeDelta <= 0.025) {
 								if (this.state.mapType == 'mutedStandard') this.setState({mapType: 'hybrid'});
