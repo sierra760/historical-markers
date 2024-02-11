@@ -12,8 +12,11 @@ else
 	ln -s ./app-"$1".json ./app.json
 	cd ./assets
 	unlink ./current
-	ln -s ./"$1" ./current
+	ln -s "$1" ./current
 	cd ..
 	rm app-region.js
 	echo "export const selectedRegion = '$1';" > app-region.js
+	rm .easignore
+	cp .gitignore .easignore
+	printf '!assets/%s/photos_compressed/\n!assets/%s/markers.json' $1 $1 >> .easignore
 fi

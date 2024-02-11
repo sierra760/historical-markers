@@ -132,7 +132,7 @@ export default class App extends React.Component {
 		} else {
 			// Location permission granted
 			global.location_permission = true;
-			const GEOLOCATION_OPTIONS = { enableHighAccuracy: true, timeout: 30000, maximumAge: 1000, distanceInterval: 100 };
+			const GEOLOCATION_OPTIONS = { accuracy: Location.Accuracy.High, distanceInterval: 100 };
 			Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
 			DeviceEventEmitter.addListener("event.updateLocation", () => {
 				this.updateLocation();
@@ -236,7 +236,6 @@ export default class App extends React.Component {
 	};
 	
 	locationChanged = (loc) => {
-		console.log("Location update triggered from callback: ", loc);
 		global.location = [loc.coords.longitude, loc.coords.latitude];
 		global.data_clean.forEach((feature) => {
 			let {d, b, bv} = haversine(

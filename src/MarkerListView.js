@@ -53,12 +53,12 @@ export default class MarkerListView extends Component {
 	callRefreshControl = () => {
 		this.setState({ refreshing: true });
 		DeviceEventEmitter.emit("event.updateLocation");
-		this.setState({ refreshing: false });
 	};
 
 	async componentDidMount() {
 		DeviceEventEmitter.addListener("event.locationUpdated", () => {
 			this.applyFilter();
+			this.setState({ refreshing: false });
 		});
 		this.applyFilter();
 	}
@@ -180,7 +180,7 @@ export default class MarkerListView extends Component {
 						<RefreshControl
 							refreshing={this.state.refreshing}
 							onRefresh={() => this.callRefreshControl()}
-							title="Pull down to update marker distances..."
+							title="Pull down to update marker distances based on your current location..."
 							tintColor={theme.lighterOnBackground}
 							titleColor={theme.lighterOnBackground}
 						/>

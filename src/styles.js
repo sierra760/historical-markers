@@ -289,7 +289,7 @@ export const styles = StyleSheet.create({
 		backgroundColor: theme.primaryBackgroundDarkest,
 	},
 	searchInputStyle: {
-		color: theme.buttonTitle,
+		color: theme.lighterOnBackground,
 		fontFamily: theme.subheaderFont,
 	},
 	emptyList: {
