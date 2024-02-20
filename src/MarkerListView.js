@@ -180,7 +180,7 @@ export default class MarkerListView extends Component {
 						<RefreshControl
 							refreshing={this.state.refreshing}
 							onRefresh={() => this.callRefreshControl()}
-							title="Pull down to update marker distances based on your current location..."
+							title="Pull down to update distances based on your location..."
 							tintColor={theme.lighterOnBackground}
 							titleColor={theme.lighterOnBackground}
 						/>

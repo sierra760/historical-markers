@@ -3,12 +3,136 @@
 // See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
-import { ScrollView, View, Image, Text, Dimensions, Linking } from "react-native";
+import { ScrollView, View, Image, Text, Switch, Dimensions, Linking, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from 'expo-file-system';
+import { unzip } from "react-native-zip-archive";
 
 import { region, theme } from "./regions";
+import { friendlyFileSize } from "./utils";
 import { styles } from "./styles";
 
 export default class SettingsView extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.download = null;
+		this.state = {
+			progress: null
+		};
+	}
+
+	downloadProgressUpdate = (downloadProgress) => {
+		this.setState({progress: downloadProgress});
+	}
+	
+	unzipAndFinishDownload = (uri, destination) => {
+		unzip(uri, destination)
+			.then((path) => {
+				FileSystem.deleteAsync(destination + 'images.zip');
+				// After download and decompress, flag completion
+				AsyncStorage.setItem("images_downloaded", JSON.stringify(true));
+				global.images_downloaded = true;
+				this.setState({progress: null});
+			})
+	}
+
+	toggleImageDownload = async(value) => {
+		const reg_abbr = region["abbr"].toLowerCase();
+		AsyncStorage.setItem("download_images", JSON.stringify(value));
+		global.download_images = value;
+		// Download images from S3 and decompress
+		if (global.download_images == true) {
+			this.forceUpdate();
+			// Download region's image archive
+			if (global.images_downloaded == false) {
+				// Check if there is an existing download in progress and resume if present
+				const downloadSnapshotJson = await AsyncStorage.getItem('pausedDownload');
+				if (downloadSnapshotJson) {
+					console.log("found download", downloadSnapshotJson);
+					AsyncStorage.removeItem('pausedDownload');
+					const downloadSnapshot = JSON.parse(downloadSnapshotJson);
+					this.download = new FileSystem.DownloadResumable(
+						downloadSnapshot.url,
+						downloadSnapshot.fileUri,
+						downloadSnapshot.options,
+						this.downloadProgressUpdate,
+						downloadSnapshot.resumeData
+					);
+					try {
+						const { uri } = await this.download.resumeAsync();
+						this.setState({progress: 'unzip'});
+						unzipAndFinishDownload(uri, FileSystem.documentDirectory);
+					}
+					catch (e) {
+						this.setState({progress: 'error'});
+					}
+				}
+				// Start new download if none found
+				else {
+					try {
+						this.download = FileSystem.createDownloadResumable(
+							`http://historical-markers.s3-website-us-west-1.amazonaws.com/downloads/${reg_abbr}.zip`,
+							FileSystem.documentDirectory + 'images.zip',
+							{},
+							this.downloadProgressUpdate
+						);
+						this.download.downloadAsync()
+							.then(({ uri }) => {
+								this.setState({progress: 'unzip'});
+								unzipAndFinishDownload(uri, FileSystem.documentDirectory)
+							})
+					}
+					catch (e) {
+						this.setState({progress: 'error'});
+					}
+				}
+			}
+		}
+		// Remove any downloaded images that are present
+		else {
+			if (this.download != null) {
+				this.download.cancelAsync();
+				FileSystem.deleteAsync(FileSystem.documentDirectory + 'images.zip');
+				this.setState({progress: null});
+			}
+			if (global.images_downloaded == true) {
+				Alert.alert('Delete all downloaded images?',`All available photos of historical markers in ${region.name} are currently stored on your device.  Storing images on your device lets you view them even if your device is not connected to the Internet.  If you choose to proceed, all marker images will be removed from your device and approximately ${region.downloadSize} of storage will be freed.  You will still be able to view images of historical markers as long as your device has an active Internet connection.`,
+				[
+					{
+						text: 'Yes, Delete All',
+						onPress: () => {
+							FileSystem.deleteAsync(FileSystem.documentDirectory + `${reg_abbr}/`);
+							AsyncStorage.setItem("images_downloaded", JSON.stringify(false));
+							global.images_downloaded = false;
+							this.forceUpdate();
+						}
+					},
+					{
+						text: 'No, Cancel Deletion',
+						onPress: () => {
+							AsyncStorage.setItem("download_images", JSON.stringify(true));
+							global.download_images = true;
+							this.forceUpdate();
+						}
+					},
+				]
+				)
+			}
+		}
+	};
+	
+	componentDidMount = async() => {
+		this.toggleImageDownload(global.download_images);
+	}
+	
+	componentWillUnmount = async() => {
+		if (this.download != null) {
+			this.download.pauseAsync();
+			AsyncStorage.setItem('pausedDownload', JSON.stringify(this.download.savable()));
+		}
+	}
+
 	render() {
 		const win = Dimensions.get("window");
 		return (
@@ -21,16 +145,52 @@ export default class SettingsView extends React.Component {
 					source={require("../assets/current/splash-small.png")}
 				/>
 				<View style={styles.aboutTextContainer}>
+					<Text style={styles.aboutHeading}>Settings</Text>
+					<View style={styles.settingsWrapper}>
+						<View style={{ flexDirection: 'row' }}>
+							<Switch
+								style={{marginTop: 5}}
+								trackColor={{false: theme.primaryBackgroundDarkest, true: theme.lightOnBackground}}
+								ios_backgroundColor={'rgba(0,0,0,0.25)'}
+								value={global.download_images}
+								onValueChange={(value) => this.toggleImageDownload(value)}
+							/>
+							<Text style={styles.settingsSwitchLabel}>Store Marker Photos on Device{"\n"}({region.downloadSize} download required)</Text>
+						</View>
+						{this.state.progress != null && this.state.progress != 'unzip'
+							?	<View style={styles.settingsProgressBar}>
+									<Text style={styles.settingsProgressLabel}>{friendlyFileSize(this.state.progress.totalBytesWritten)} of {friendlyFileSize(this.state.progress.totalBytesExpectedToWrite)} transferred ({Math.round(this.state.progress.totalBytesWritten / this.state.progress.totalBytesExpectedToWrite * 1000) / 10}%)</Text>
+								</View>
+							: null
+						}
+						{this.state.progress == 'unzip'
+							?	<View style={styles.settingsProgressBar}>
+									<Text style={styles.settingsProgressLabel}>Processing downloading images...</Text>
+								</View>
+							: null
+						}
+						{global.images_downloaded == true
+							?	<View style={styles.settingsProgressBar}>
+									<Text style={styles.settingsProgressLabel}>All marker images are currently stored on your device.</Text>
+								</View>
+							: null
+						}
+						<View>
+							<Text style={styles.settingsCaption}>Storing all of the available marker images on your device ensures that you can view the images even while your device does not have an Internet connection.  If this option is not enabled, images of historical markers will only be visible if your device is connected to the Internet.</Text>
+						</View>
+					</View>
+				</View>
+				<View style={styles.aboutTextContainer}>
 					<Text style={styles.aboutHeading}>About This App</Text>
 					<Text style={styles.aboutText}>{region.name} Historical Markers is a free app that allows you to locate and learn about the many historical markers that have been placed throughout the U.S. state of {region.name}. Historical markers serve as tangible links to the past, providing educational insights about historical events, figures, and places. By reading these markers, you can learn many things about {region.name} history, including about significant events that occurred throughout the state's history and notable individuals associated with the state.</Text>
-					<Text style={styles.aboutText}>This app is meant to be a travel companion as you explore the the state of {region.name}, as well as an educational tool. You can explore historical markers in a list or on a map, and by tapping on any marker's title, you can view the marker's inscription and location, and oftentimes even see several photos of the marker and its surrounding location. Markers can be filtered by name, county, and whether you have saved the marker as one of your favorites.</Text>
+					<Text style={styles.aboutText}>This app is meant to be a travel companion as you explore the state of {region.name}, as well as an educational tool. You can explore historical markers in a list or on a map, and by tapping on any marker's title, you can view the marker's inscription and location, and oftentimes even see several photos of the marker and its surrounding location. Markers can be filtered by name, county, and whether you have saved the marker as one of your favorites.</Text>
 					<Text style={styles.aboutText}>The vast majority of the information about the historical markers in this app was derived from The Historical Marker Database (HMdb.org) under the terms of the HMdb.org content license. Marker information and images posted to HMdb.org are the property of HMdb.org and/or the users who contributed content to that website. Users must be aware that the developer has not verified the accuracy or quality of information obtained from external sources, and the developer is not responsible for any aspect of content created and/or owned by other parties, including but not limited to inaccuracies, errors, and omissions.</Text>
 					<Text style={styles.aboutLink} onPress={() => Linking.openURL("https://www.hmdb.org/copyright.asp")}>
 						Most of the content presented within this app is being used under the terms of the copyright license posted by the Historical Marker Database (HMdb.org). More information about HMdb.org's content ownership and copyright policy can be found here.
 					</Text>
-					<Text style={styles.aboutText}>Aside from system fonts, the fonts and typefaces used in this app, including Rye (major headings), Asap Condensed (minor headings and filters), and EB Garamond (body text) are licensed under the terms of the SIL Open Font License.  These fonts are bundled with this application and are also available for download from Google Fonts as well as this application's GitHub repository.
+					<Text style={styles.aboutText}>Aside from system fonts, the fonts and typefaces used in this app are licensed under the terms of the SIL Open Font License.  These fonts are bundled with this application and are also available for download from Google Fonts as well as this application's GitHub repository.
 					</Text>
-					<Text style={styles.aboutLink} onPress={() => Linking.openURL("https://openfontlicense.org/documents/OFL.txt")}>Tap here to view the full text of the SIL Open Font license that governs the use of the bundled fonts.  The idential full text of the SIL license also accompanies the font files in this application's GitHub repository.
+					<Text style={styles.aboutLink} onPress={() => Linking.openURL("https://openfontlicense.org/documents/OFL.txt")}>Tap here to view the full text of the SIL Open Font license that governs the use of the bundled fonts.  The identical full text of the SIL license also accompanies the font files in this application's GitHub repository.
 					</Text>
 					<Text style={styles.aboutText}>Given that cellular service remains sparse in many parts of rural {region.name}, the app is designed to be fully functional even without a cellular signal or Internet connection. All marker content and images are stored on your device and will remain accessible even if your device is offline, but maps may be less detailed or hidden altogether while your device is offline.</Text>
 					<Text style={styles.aboutText}>{region.name} Historical Markers is the first in a series of state historical marker applications developed by Dr. Sierra Burkhart, {region.name} history enthusiast and the Academic Director of UCLA Geospatial. This app is and always will be free to use, and its source code is available for download on Github.</Text>

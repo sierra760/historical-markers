@@ -39,4 +39,4 @@ yarn-error.*
 retrieval/
 assets_original/
 assets/**/markers.json
-assets/**/photos_compressed/
+photos_compressed/

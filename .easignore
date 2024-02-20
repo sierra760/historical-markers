@@ -39,6 +39,6 @@ yarn-error.*
 retrieval/
 assets_original/
 assets/**/markers.json
-assets/**/photos_compressed/
-!assets/az/photos_compressed/
-!assets/az/markers.json
+photos_compressed/
+!assets/nv/photos_compressed/
+!assets/nv/markers.json

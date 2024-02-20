@@ -25,7 +25,7 @@ import MarkerMapView from "./src/MarkerMapView";
 import MarkerDetailView from "./src/MarkerDetailView";
 import MarkerFilterHeader from "./src/MarkerFilterHeader";
 import { styles } from "./src/styles";
-import { importAll, haversine, sortArrayofObjects, getBoundingBox, fulfillWithTimeLimit } from "./src/utils";
+import { importAll, haversine, sortArrayofObjects, getBoundingBox } from "./src/utils";
 
 // STATE/REGION CONFIGURATION
 // To change the app's state/region, edit the string literal on line 2 of the file imported below
@@ -48,6 +48,8 @@ global.counties = [
 		value: "all",
 	},
 ];
+global.download_images = null;
+global.images_downloaded = null;
 global.location_permission = null;
 global.location = null;
 global.online = null;
@@ -58,6 +60,7 @@ export default class App extends React.Component {
 		this.state = {
 			fontsLoaded: false,
 			dataLoaded: false,
+			imageSettingsLoaded: false,
 			filterLoaded: false,
 			deviceConnected: null,
 		};
@@ -68,11 +71,24 @@ export default class App extends React.Component {
 			AsapCondensed: require("./assets/fonts/AsapCondensed-Regular.ttf"),
 			EBGaramond: require("./assets/fonts/EBGaramond-VariableFont_wght.ttf"),
 			Rye: require("./assets/fonts/Rye-Regular.ttf"),
+			Pacifico: require("./assets/fonts/Pacifico-Regular.ttf"),
 		});
 		this.setState({
 			fontsLoaded: true,
 		});
 	};
+	
+	loadImageSettings = async() => {
+		download_images = JSON.parse(await AsyncStorage.getItem("download_images"));
+		if (download_images != null) global.download_images = download_images;
+		else global.download_images = false;
+		images_downloaded = JSON.parse(await AsyncStorage.getItem("images_downloaded"));
+		if (images_downloaded != null) global.download_images = images_downloaded;
+		else global.images_downloaded = false;		
+		this.setState({
+			imageSettingsLoaded: true,
+		});
+	}
 
 	loadFilter = async () => {
 		// Configure filter
@@ -95,21 +111,15 @@ export default class App extends React.Component {
 		this.setState({
 			filterLoaded: true,
 		});
+		this.loadImageSettings();
 		this.loadData();
 	};
 
 	loadData = async() => {
 		const markers = require("./assets/current/markers.json");
-		const images = importAll(
-			require.context("./assets/current/photos_compressed"),
-		);
+		// Do not load images locally upfront if dealing with CA
 		let counties = [];
 		markers.features.forEach((feature) => {
-			if (!feature.properties.hasOwnProperty("images"))
-				feature.properties.images = {};
-			feature.properties.photos.forEach((photo) => {
-				feature.properties.images[photo.filename] = images[photo.filename];
-			});
 			if (counties.indexOf(feature.properties.county) == -1) {
 				counties.push(feature.properties.county);
 			}
@@ -156,7 +166,7 @@ export default class App extends React.Component {
 			}
 			// County filter
 			if (global.filter.county != "all") {
-				if (item.properties.county.indexOf(global.filter.county) == -1)
+				if (item.properties.county != global.filter.county)
 					match = false;
 			}
 			// Search filter
@@ -203,12 +213,12 @@ export default class App extends React.Component {
 				) : null}
 
 				<Tab.Screen
-					name="About"
+					name="Settings"
 					component={SettingsView}
 					options={{
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons
-								name="information-circle-outline"
+								name="settings-outline"
 								color={color}
 								size={size}
 							/>
@@ -270,6 +280,7 @@ export default class App extends React.Component {
 		if (
 			this.state.fontsLoaded &&
 			this.state.dataLoaded &&
+			this.state.imageSettingsLoaded &&
 			this.state.filterLoaded &&
 			this.state.deviceConnected != null &&
 			global.location_permission != null

@@ -157,7 +157,6 @@ export const styles = StyleSheet.create({
 		padding: 15,
 		marginRight: 15,
 		marginLeft: 15,
-		marginBottom: 30,
 	},
 	modalContainer: {
 		backgroundColor: theme.modalBackground,
@@ -199,7 +198,7 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold",
 		fontSize: 18,
 		textAlign: "left",
-		marginTop: 25,
+		marginTop: 20,
 		textTransform: "uppercase",
 		color: theme.contrastOnSplashBackground,
 		fontFamily: theme.headerFont,
@@ -220,6 +219,41 @@ export const styles = StyleSheet.create({
 		fontSize: 16,
 		color: theme.contrastOnSplashBackground,
 		fontFamily: theme.bodyFont,
+	},
+	settingsWrapper: {
+		backgroundColor: "rgba(0,0,0,0.25)",
+		borderRadius: 16,
+		marginTop: 15,
+		padding: 20
+	},
+	settingsProgressBar: {
+		borderTopWidth: 1,
+		borderTopColor: theme.contrastOnSplashBackground,
+		borderBottomWidth: 1,
+		borderBottomColor: theme.contrastOnSplashBackground,
+		paddingTop: 10,
+		paddingBottom: 10,
+		marginTop: 20
+	},
+	settingsProgressLabel: {
+		color: theme.contrastOnSplashBackground,
+		fontFamily: theme.subheaderFont
+	},
+	settingsSwitchLabel: {
+		flex: 1,
+		marginLeft: 10,
+		color: theme.contrastOnSplashBackground,
+		fontFamily: theme.subheaderFont,
+		fontSize: 18
+	},
+	settingsCaption: {
+		flex: 1,
+		marginTop: 10,
+		paddingTop: 10,
+		color: theme.contrastOnSplashBackground,
+		fontFamily: theme.subheaderFont,
+		fontSize: 16,
+		lineHeight: 24
 	},
 	modalTitle: {
 		fontFamily: theme.headerFont,

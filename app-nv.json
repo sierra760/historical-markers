@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nevada Historical Markers",
     "slug": "historicalmarkers-nv",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/nv/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.sierraburkhart.historicalmarkers.nevada",
       "supportsTablet": true,
       "infoPlist": {
-        "CFBundleDisplayName": "NV History"
+        "CFBundleDisplayName": "NV History",
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
       }
     },
     "android": {

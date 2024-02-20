@@ -20,6 +20,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from "@expo/vector-icons";
 import ImageView from "react-native-image-viewing";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from 'expo-file-system';
 
 import { styles } from "./styles";
 import { region, theme } from "./regions";
@@ -102,6 +103,7 @@ export default class MarkerDetailView extends Component {
 			title: ``,
 		});
 		const win = Dimensions.get("window");
+		const reg_abbr = region["abbr"].toLowerCase();
 		const bgImage =
 			this.props.route.params.properties.photos[
 				Math.floor(
@@ -118,11 +120,17 @@ export default class MarkerDetailView extends Component {
 			this.props.route.params.properties.bearing = b;
 			this.props.route.params.properties.bearing_verbose = bv;
 		}
+		if (global.images_downloaded == true) img_url_prefix = FileSystem.documentDirectory + reg_abbr;
+		else img_url_prefix = `http://historical-markers.s3-website-us-west-1.amazonaws.com/${reg_abbr}/photos_compressed`;
 		let lightbox_photos = [];
 		this.props.route.params.properties.photos.forEach((photo) => {
-    		lightbox_photos.push(this.props.route.params.properties.images[photo.filename]);
+			if (global.images_downloaded == true) lightbox_photos.push({uri: FileSystem.documentDirectory + `${reg_abbr}/${photo.filename}`})
+    		else lightbox_photos.push({uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${reg_abbr}/photos_compressed/${photo.filename}`});
     	});
-    	if (this.props.route.params.properties.photos.length > 0) imageSource = this.props.route.params.properties.images[bgImage.filename];
+    	if (this.props.route.params.properties.photos.length > 0) {
+    		if (global.images_downloaded == true) imageSource = {uri: FileSystem.documentDirectory + `${reg_abbr}/${bgImage.filename}`};
+    		else imageSource = {uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${reg_abbr}/photos_compressed/${bgImage.filename}`};
+    	}
     	else imageSource = 'none';
 		return (
 			<View>
@@ -336,8 +344,7 @@ export default class MarkerDetailView extends Component {
 													height: "100%",
 												}}
 												source={
-													this.props.route.params.properties
-														.images[photo.filename]
+													`${img_url_prefix}/${photo.filename}` 
 												}
 												resizeMethod="resize"
 												resizeMode="contain"

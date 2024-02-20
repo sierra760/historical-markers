@@ -107,16 +107,7 @@ export const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export const fulfillWithTimeLimit = async(timeLimit, task, failureValue) => {
-    let timeout;
-    const timeoutPromise = new Promise((resolve, reject) => {
-        timeout = setTimeout(() => {
-            resolve(failureValue);
-        }, timeLimit);
-    });
-    const response = await Promise.race([task, timeoutPromise]);
-    if(timeout){
-        clearTimeout(timeout);
-    }
-    return response;
+export const friendlyFileSize = (size) => {
+    var i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+    return (size / Math.pow(1024, i)).toFixed(1) + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
 }

@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "California Historical Markers",
+    "slug": "historicalmarkers-ca",
+    "version": "1.0.2",
+    "orientation": "portrait",
+    "icon": "./assets/ca/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/ca/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#519fbb"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "buildNumber": "1",
+      "bundleIdentifier": "com.sierraburkhart.historicalmarkers.california",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDisplayName": "CA History"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/ca/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sierraburkhart.historicalmarkers.california"
+    },
+    "web": {
+      "favicon": "./assets/ca/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "If you allow California Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+          "locationAlwaysAndWhenInUsePermission": "If you allow California Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ]
+    ]
+  }
+}

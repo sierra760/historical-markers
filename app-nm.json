@@ -2,7 +2,7 @@
   "expo": {
     "name": "New Mexico Historical Markers",
     "slug": "historicalmarkers-nm",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/nm/icon.png",
     "userInterfaceStyle": "automatic",
