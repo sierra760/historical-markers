@@ -10,8 +10,8 @@ The code in this repository supports the following published iOS applications (i
 - [Nevada Historical Markers](https://apps.apple.com/us/app/nevada-historical-markers/id6477352146)
 - [New Mexico Historical Markers](https://apps.apple.com/us/app/new-mexico-historical-markers/id6477751451)
 - [Arizona Historical Markers](https://apps.apple.com/us/app/arizona-historical-markers/id6477751420)
-- Colorado Historical Markers (in review)
-- Montana Historical Markers (coming soon)
+- [Colorado Historical Markers](https://apps.apple.com/us/app/colorado-historical-markers/id6477751225)
+- [Montana Historical Markers](https://apps.apple.com/us/app/montana-historical-markers/id6477809186)
 
 Following these will be a release for California (the developer's home state).  California would have come much sooner were it not for the challenges involved in bundling images of the more than 12,000 catalogued historical markers within the state without creating an unacceptably large binary.
 
