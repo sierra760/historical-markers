@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.sierraburkhart.historicalmarkers.colorado",
       "supportsTablet": true,
       "infoPlist": {
-        "CFBundleDisplayName": "CO History"
+        "CFBundleDisplayName": "CO History",
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
       }
     },
     "android": {

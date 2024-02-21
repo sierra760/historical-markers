@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.sierraburkhart.historicalmarkers.new-mexico",
       "supportsTablet": true,
       "infoPlist": {
-        "CFBundleDisplayName": "NM History"
+        "CFBundleDisplayName": "NM History",
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
       }
     },
     "android": {

@@ -17,13 +17,32 @@ export default class SettingsView extends React.Component {
 	constructor(props) {
 		super(props);
 		this.download = null;
+		this.update_counter = 0;
 		this.state = {
 			progress: null
 		};
 	}
+	
+	setImagesDownloaded = (status) => {
+		AsyncStorage.setItem("images_downloaded", JSON.stringify(status));
+		global.images_downloaded = status;
+		this.download = null;
+		this.setState({progress: null});
+	}
+	
+	setDownloadImages = (status) => {
+		AsyncStorage.setItem("download_images", JSON.stringify(status));
+		global.download_images = status;
+	}
 
 	downloadProgressUpdate = (downloadProgress) => {
-		this.setState({progress: downloadProgress});
+		if (this.update_counter % 50 == 0) this.setState({progress: downloadProgress});
+		this.update_counter += 1;
+	}
+	
+	handleDownloadError = (e) => {
+		this.download = null;
+		this.setState({progress: 'error'});
 	}
 	
 	unzipAndFinishDownload = (uri, destination) => {
@@ -31,88 +50,60 @@ export default class SettingsView extends React.Component {
 			.then((path) => {
 				FileSystem.deleteAsync(destination + 'images.zip');
 				// After download and decompress, flag completion
-				AsyncStorage.setItem("images_downloaded", JSON.stringify(true));
-				global.images_downloaded = true;
-				this.setState({progress: null});
+				this.setImagesDownloaded(true);
 			})
 	}
 
 	toggleImageDownload = async(value) => {
-		const reg_abbr = region["abbr"].toLowerCase();
-		AsyncStorage.setItem("download_images", JSON.stringify(value));
-		global.download_images = value;
-		// Download images from S3 and decompress
+		// Save setting before proceeding
+		this.setDownloadImages(value);
+		// Executed when switch is toggled on
 		if (global.download_images == true) {
 			this.forceUpdate();
 			// Download region's image archive
-			if (global.images_downloaded == false) {
-				// Check if there is an existing download in progress and resume if present
-				const downloadSnapshotJson = await AsyncStorage.getItem('pausedDownload');
-				if (downloadSnapshotJson) {
-					console.log("found download", downloadSnapshotJson);
-					AsyncStorage.removeItem('pausedDownload');
-					const downloadSnapshot = JSON.parse(downloadSnapshotJson);
-					this.download = new FileSystem.DownloadResumable(
-						downloadSnapshot.url,
-						downloadSnapshot.fileUri,
-						downloadSnapshot.options,
-						this.downloadProgressUpdate,
-						downloadSnapshot.resumeData
+			if (global.images_downloaded == false && this.download == null) {
+				try {
+					this.download = FileSystem.createDownloadResumable(
+						`http://historical-markers.s3-website-us-west-1.amazonaws.com/downloads/${region.abbr_lower}.zip`,
+						FileSystem.documentDirectory + 'images.zip',
+						{},
+						this.downloadProgressUpdate
 					);
-					try {
-						const { uri } = await this.download.resumeAsync();
-						this.setState({progress: 'unzip'});
-						unzipAndFinishDownload(uri, FileSystem.documentDirectory);
-					}
-					catch (e) {
-						this.setState({progress: 'error'});
-					}
+					this.download.downloadAsync()
+						.then(({ uri }) => {
+							this.setState({progress: 'unzip'});
+							this.unzipAndFinishDownload(uri, FileSystem.documentDirectory)
+						})
 				}
-				// Start new download if none found
-				else {
-					try {
-						this.download = FileSystem.createDownloadResumable(
-							`http://historical-markers.s3-website-us-west-1.amazonaws.com/downloads/${reg_abbr}.zip`,
-							FileSystem.documentDirectory + 'images.zip',
-							{},
-							this.downloadProgressUpdate
-						);
-						this.download.downloadAsync()
-							.then(({ uri }) => {
-								this.setState({progress: 'unzip'});
-								unzipAndFinishDownload(uri, FileSystem.documentDirectory)
-							})
-					}
-					catch (e) {
-						this.setState({progress: 'error'});
-					}
+				catch (e) {
+					this.handleDownloadError(e);
 				}
 			}
 		}
-		// Remove any downloaded images that are present
+		
+		// Executed when switch is toggled off
 		else {
+			// If there is an active download, cancel it 
 			if (this.download != null) {
 				this.download.cancelAsync();
 				FileSystem.deleteAsync(FileSystem.documentDirectory + 'images.zip');
-				this.setState({progress: null});
+				this.setImagesDownloaded(false);
 			}
 			if (global.images_downloaded == true) {
-				Alert.alert('Delete all downloaded images?',`All available photos of historical markers in ${region.name} are currently stored on your device.  Storing images on your device lets you view them even if your device is not connected to the Internet.  If you choose to proceed, all marker images will be removed from your device and approximately ${region.downloadSize} of storage will be freed.  You will still be able to view images of historical markers as long as your device has an active Internet connection.`,
+				Alert.alert('Delete all downloaded images?',`All available photos of historical markers in ${region.name} are currently stored on your device.  Storing images on your device lets you view them even if your device is offline.  If you choose to proceed, all marker images will be removed from your device and approximately ${region.downloadSize} of storage will be freed.  You will still be able to view images of historical markers as long as your device is online.`,
 				[
 					{
 						text: 'Yes, Delete All',
 						onPress: () => {
-							FileSystem.deleteAsync(FileSystem.documentDirectory + `${reg_abbr}/`);
-							AsyncStorage.setItem("images_downloaded", JSON.stringify(false));
-							global.images_downloaded = false;
+							FileSystem.deleteAsync(FileSystem.documentDirectory + `${region.abbr_lower}/`);
+							this.setImagesDownloaded(false);
 							this.forceUpdate();
 						}
 					},
 					{
 						text: 'No, Cancel Deletion',
 						onPress: () => {
-							AsyncStorage.setItem("download_images", JSON.stringify(true));
-							global.download_images = true;
+							this.setDownloadImages(true);
 							this.forceUpdate();
 						}
 					},
@@ -123,14 +114,7 @@ export default class SettingsView extends React.Component {
 	};
 	
 	componentDidMount = async() => {
-		this.toggleImageDownload(global.download_images);
-	}
-	
-	componentWillUnmount = async() => {
-		if (this.download != null) {
-			this.download.pauseAsync();
-			AsyncStorage.setItem('pausedDownload', JSON.stringify(this.download.savable()));
-		}
+		if (global.download_images == true && global.images_downloaded == false) this.toggleImageDownload(true);
 	}
 
 	render() {
@@ -150,16 +134,22 @@ export default class SettingsView extends React.Component {
 						<View style={{ flexDirection: 'row' }}>
 							<Switch
 								style={{marginTop: 5}}
-								trackColor={{false: theme.primaryBackgroundDarkest, true: theme.lightOnBackground}}
+								trackColor={{false: theme.primaryBackgroundDarkest, true: theme.splashBackground}}
 								ios_backgroundColor={'rgba(0,0,0,0.25)'}
 								value={global.download_images}
 								onValueChange={(value) => this.toggleImageDownload(value)}
 							/>
-							<Text style={styles.settingsSwitchLabel}>Store Marker Photos on Device{"\n"}({region.downloadSize} download required)</Text>
+							<Text style={styles.settingsSwitchLabel}>Store Marker Photos on Device{"\n"}({region.downloadSize} storage required)</Text>
 						</View>
 						{this.state.progress != null && this.state.progress != 'unzip'
 							?	<View style={styles.settingsProgressBar}>
 									<Text style={styles.settingsProgressLabel}>{friendlyFileSize(this.state.progress.totalBytesWritten)} of {friendlyFileSize(this.state.progress.totalBytesExpectedToWrite)} transferred ({Math.round(this.state.progress.totalBytesWritten / this.state.progress.totalBytesExpectedToWrite * 1000) / 10}%)</Text>
+								</View>
+							: null
+						}
+						{this.state.progress == 'error'
+							?	<View style={styles.settingsProgressBar}>
+									<Text style={styles.settingsProgressLabel}>An error occurred while downloading and processing the marker photos.  Toggle the switch above to reattempt.</Text>
 								</View>
 							: null
 						}
@@ -176,7 +166,7 @@ export default class SettingsView extends React.Component {
 							: null
 						}
 						<View>
-							<Text style={styles.settingsCaption}>Storing all of the available marker images on your device ensures that you can view the images even while your device does not have an Internet connection.  If this option is not enabled, images of historical markers will only be visible if your device is connected to the Internet.</Text>
+							<Text style={styles.settingsCaption}>Storing all of the available historical marker images on your device ensures that you can view the images even while your device is offline.  If this option is not enabled, images of historical markers will only be visible if your device is online.  This option is recommended if you plan to use {region.name} Historical Markers in rural areas with limited connectivity.</Text>
 						</View>
 					</View>
 				</View>

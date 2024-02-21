@@ -79,12 +79,13 @@ export default class App extends React.Component {
 	};
 	
 	loadImageSettings = async() => {
-		download_images = JSON.parse(await AsyncStorage.getItem("download_images"));
+		download_images = await AsyncStorage.getItem("download_images");
+		download_images = JSON.parse(download_images);
 		if (download_images != null) global.download_images = download_images;
 		else global.download_images = false;
 		images_downloaded = JSON.parse(await AsyncStorage.getItem("images_downloaded"));
-		if (images_downloaded != null) global.download_images = images_downloaded;
-		else global.images_downloaded = false;		
+		if (images_downloaded != null) global.images_downloaded = images_downloaded;
+		else global.images_downloaded = false;
 		this.setState({
 			imageSettingsLoaded: true,
 		});
@@ -185,8 +186,7 @@ export default class App extends React.Component {
 			<Tab.Navigator
 				screenOptions={{
 					tabBarActiveTintColor: theme.activeTabBackground,
-					headerShown: false,
-					unmountOnBlur: true,
+					headerShown: false
 				}}
 			>
 				<Tab.Screen

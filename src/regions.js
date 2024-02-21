@@ -11,6 +11,7 @@ const regions = {
 	nv: {
 		name: "Nevada",
 		abbr: "NV",
+		abbr_lower: "nv",
 		nickname: "Silver State",
 		statewideMapExtent: {lat_min: 35.003, lat_max: 42.003, lon_min: -120.0037, lon_max: -114.0436},
 		aboutSplashWidth: 0.912109375,
@@ -68,9 +69,11 @@ const regions = {
 	nm: {
 		name: "New Mexico",
 		abbr: "NM",
+		abbr_lower: "nm",
 		nickname: "Land of Enchantment",
 		statewideMapExtent: {lat_min: 31.3337, lat_max: 36.9982, lon_min: -109.0489, lon_max: -103.0023},
 		aboutSplashWidth: 0.657919847328244,
+		downloadSize: '427 MB',
 		light: {
 			activeTabBackground: "#3891a4",
 			primaryBackground: "#06768d",
@@ -124,7 +127,9 @@ const regions = {
 	ca: {
 		name: "California",
 		abbr: "CA",
+		abbr_lower: "ca",
 		nickname: "Golden State",
+		downloadSize: '4.98 GB',
 		statewideMapExtent: {lat_min: 32.5121, lat_max: 42.0126, lon_min: -124.6509, lon_max: -114.1315},
 		light: {
 			primaryBackground: "#005a9c",
@@ -175,7 +180,9 @@ const regions = {
 	co: {
 		name: "Colorado",
 		abbr: "CO",
+		abbr_lower: "co",
 		nickname: "Centennial State",
+		downloadSize: '512 MB',
 		statewideMapExtent: {lat_min: 36.9949, lat_max: 41.0006, lon_min: -109.0489, lon_max: -102.0424},
 		aboutSplashWidth: 0.68344465648855,
 		light: {
@@ -231,7 +238,9 @@ const regions = {
 	az: {
 		name: "Arizona",
 		abbr: "AZ",
+		abbr_lower: "az",
 		nickname: "Grand Canyon State",
+		downloadSize: '606 MB',
 		statewideMapExtent: {lat_min: 31.3325, lat_max: 37.0004, lon_min: -114.8126, lon_max: -109.0475},
 		aboutSplashWidth: 0.704914122137405,
 		light: {
@@ -287,7 +296,9 @@ const regions = {
 	mt: {
 		name: "Montana",
 		abbr: "MT",
+		abbr_lower: "mt",
 		nickname: "Treasure State",
+		downloadSize: '552 MB',
 		statewideMapExtent: {lat_min: 44.3563, lat_max: 48.9991, lon_min: -116.0458, lon_max: -104.0186},
 		aboutSplashWidth: 0.611402671755725,
 		light: {

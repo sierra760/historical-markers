@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.sierraburkhart.historicalmarkers.arizona",
       "supportsTablet": true,
       "infoPlist": {
-        "CFBundleDisplayName": "AZ History"
+        "CFBundleDisplayName": "AZ History",
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
       }
     },
     "android": {

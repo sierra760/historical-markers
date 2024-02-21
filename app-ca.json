@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.sierraburkhart.historicalmarkers.california",
       "supportsTablet": true,
       "infoPlist": {
-        "CFBundleDisplayName": "CA History"
+        "CFBundleDisplayName": "CA History",
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
       }
     },
     "android": {

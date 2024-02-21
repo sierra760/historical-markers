@@ -103,7 +103,6 @@ export default class MarkerDetailView extends Component {
 			title: ``,
 		});
 		const win = Dimensions.get("window");
-		const reg_abbr = region["abbr"].toLowerCase();
 		const bgImage =
 			this.props.route.params.properties.photos[
 				Math.floor(
@@ -120,16 +119,16 @@ export default class MarkerDetailView extends Component {
 			this.props.route.params.properties.bearing = b;
 			this.props.route.params.properties.bearing_verbose = bv;
 		}
-		if (global.images_downloaded == true) img_url_prefix = FileSystem.documentDirectory + reg_abbr;
-		else img_url_prefix = `http://historical-markers.s3-website-us-west-1.amazonaws.com/${reg_abbr}/photos_compressed`;
+		if (global.images_downloaded == true) img_url_prefix = FileSystem.documentDirectory + region.abbr_lower;
+		else img_url_prefix = `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed`;
 		let lightbox_photos = [];
 		this.props.route.params.properties.photos.forEach((photo) => {
-			if (global.images_downloaded == true) lightbox_photos.push({uri: FileSystem.documentDirectory + `${reg_abbr}/${photo.filename}`})
-    		else lightbox_photos.push({uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${reg_abbr}/photos_compressed/${photo.filename}`});
+			if (global.images_downloaded == true) lightbox_photos.push({uri: FileSystem.documentDirectory + `${region.abbr_lower}/${photo.filename}`})
+    		else lightbox_photos.push({uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed/${photo.filename}`});
     	});
     	if (this.props.route.params.properties.photos.length > 0) {
-    		if (global.images_downloaded == true) imageSource = {uri: FileSystem.documentDirectory + `${reg_abbr}/${bgImage.filename}`};
-    		else imageSource = {uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${reg_abbr}/photos_compressed/${bgImage.filename}`};
+    		if (global.images_downloaded == true) imageSource = {uri: FileSystem.documentDirectory + `${region.abbr_lower}/${bgImage.filename}`};
+    		else imageSource = {uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed/${bgImage.filename}`};
     	}
     	else imageSource = 'none';
 		return (
