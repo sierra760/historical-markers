@@ -40,5 +40,5 @@ retrieval/
 assets_original/
 assets/**/markers.json
 photos_compressed/
-!assets/nv/photos_compressed/
-!assets/nv/markers.json
+!assets/ca/photos_compressed/
+!assets/ca/markers.json

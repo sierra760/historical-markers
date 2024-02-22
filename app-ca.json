@@ -20,7 +20,9 @@
       "supportsTablet": true,
       "infoPlist": {
         "CFBundleDisplayName": "CA History",
-        "NSAppTransportSecurity": { "NSAllowsArbitraryLoads": true }
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
     },
     "android": {
@@ -28,7 +30,12 @@
         "foregroundImage": "./assets/ca/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sierraburkhart.historicalmarkers.california"
+      "package": "com.sierraburkhart.historicalmarkers.california",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
     },
     "web": {
       "favicon": "./assets/ca/favicon.png"
@@ -43,6 +50,11 @@
           "isAndroidBackgroundLocationEnabled": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8d1c6e11-5d76-47d7-981e-335ac61140b7"
+      }
+    }
   }
 }
