@@ -2,7 +2,7 @@
   "expo": {
     "name": "Colorado Historical Markers",
     "slug": "historicalmarkers-co",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/co/icon.png",
     "userInterfaceStyle": "automatic",

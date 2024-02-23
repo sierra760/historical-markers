@@ -221,7 +221,7 @@ export const styles = StyleSheet.create({
 		fontFamily: theme.bodyFont,
 	},
 	settingsWrapper: {
-		backgroundColor: "rgba(0,0,0,0.25)",
+		backgroundColor: "rgba(0,0,0,0.15)",
 		borderRadius: 16,
 		marginTop: 15,
 		padding: 20

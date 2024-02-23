@@ -118,7 +118,6 @@ export default class App extends React.Component {
 
 	loadData = async() => {
 		const markers = require("./assets/current/markers.json");
-		// Do not load images locally upfront if dealing with CA
 		let counties = [];
 		markers.features.forEach((feature) => {
 			if (counties.indexOf(feature.properties.county) == -1) {

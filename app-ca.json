@@ -2,14 +2,14 @@
   "expo": {
     "name": "California Historical Markers",
     "slug": "historicalmarkers-ca",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/ca/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/ca/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#519fbb"
+      "backgroundColor": "#b6d6e2"
     },
     "assetBundlePatterns": [
       "**/*"
