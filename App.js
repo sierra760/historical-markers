@@ -18,6 +18,8 @@ import * as Font from "expo-font";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
+import { Asset } from "expo-asset";
+import * as FileSystem from "expo-file-system";
 
 import SettingsView from "./src/SettingsView";
 import MarkerListView from "./src/MarkerListView";
@@ -25,34 +27,16 @@ import MarkerMapView from "./src/MarkerMapView";
 import MarkerDetailView from "./src/MarkerDetailView";
 import MarkerFilterHeader from "./src/MarkerFilterHeader";
 import { styles } from "./src/styles";
-import { importAll, haversine, sortArrayofObjects, getBoundingBox } from "./src/utils";
+import { importAll, haversine, sortArrayofObjects, getBbox, bboxToRegion } from "./src/utils";
 
-// STATE/REGION CONFIGURATION
-// To change the app's state/region, edit the string literal on line 2 of the file imported below
-// Make sure also to rename app-**.json (where ** is the abbreviation of your region) to app.json before running or building
 import { region, theme } from "./src/regions";
+import GLOBAL from './src/global.js';
 
 // Prevent splash screen from hiding until app setup has completed
 SplashScreen.preventAutoHideAsync();
 
 const Tab = createBottomTabNavigator();
 const RootStack = createNativeStackNavigator();
-
-global.data_clean = null;
-global.data = null;
-global.filter = null;
-global.favorites = null;
-global.counties = [
-	{
-		label: "All Counties",
-		value: "all",
-	},
-];
-global.download_images = null;
-global.images_downloaded = null;
-global.location_permission = null;
-global.location = null;
-global.online = null;
 
 export default class App extends React.Component {
 	constructor(props) {
@@ -62,7 +46,8 @@ export default class App extends React.Component {
 			dataLoaded: false,
 			imageSettingsLoaded: false,
 			filterLoaded: false,
-			deviceConnected: null,
+			locationPermissionsLoaded: false,
+			deviceOnline: null
 		};
 	}
 
@@ -81,43 +66,43 @@ export default class App extends React.Component {
 	loadImageSettings = async() => {
 		download_images = await AsyncStorage.getItem("download_images");
 		download_images = JSON.parse(download_images);
-		if (download_images != null) global.download_images = download_images;
-		else global.download_images = false;
+		if (download_images != null) GLOBAL.download_images = download_images;
+		else GLOBAL.download_images = false;
 		images_downloaded = JSON.parse(await AsyncStorage.getItem("images_downloaded"));
-		if (images_downloaded != null) global.images_downloaded = images_downloaded;
-		else global.images_downloaded = false;
+		if (images_downloaded != null) GLOBAL.images_downloaded = images_downloaded;
+		else GLOBAL.images_downloaded = false;
 		this.setState({
 			imageSettingsLoaded: true,
 		});
 	}
 
-	loadFilter = async () => {
-		// Configure filter
-		let empty = {
-			search: "",
-			favorites: "all",
-			county: "all",
-		};
-		let filter = await AsyncStorage.getItem("filter");
-		if (filter == null) global.filter = empty;
-		else global.filter = JSON.parse(filter);
-		// Configure favorites
-		let favorites = await AsyncStorage.getItem("favorites");
-		if (favorites == null) global.favorites = [];
-		else global.favorites = JSON.parse(favorites);
-		// Add event listener for filter changes
-		DeviceEventEmitter.addListener("event.filterData", () => {
-			this.filterData();
-		});
-		this.setState({
-			filterLoaded: true,
-		});
-		this.loadImageSettings();
-		this.loadData();
-	};
-
-	loadData = async() => {
-		const markers = require("./assets/current/markers.json");
+	loadDataAndFilter = async() => {
+		// LOAD LOCATION SETTINGS AND SETUP LOCATION HANDLING
+		let { status } = await Location.requestForegroundPermissionsAsync();
+		if (status == "granted") {
+			// Location permission granted
+			GLOBAL.location_permission = true;
+			const GEOLOCATION_OPTIONS = { accuracy: Location.Accuracy.High, distanceInterval: 100 };
+			Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+			DeviceEventEmitter.addListener("event.updateLocation", () => {
+				this.updateLocation();
+			});
+		}
+		else {
+			// Location permission not granted
+			GLOBAL.location_permission = false;
+			GLOBAL.data_clean.sort(sortArrayofObjects("title", "asc"));
+			GLOBAL.location = false;
+		}
+		this.setState({locationPermissionsLoaded: true});
+	
+		// LOAD DATA
+		// Requiring large marker JSON files results in stack overflows with hermes
+		// The issue for future reference:  https://github.com/expo/expo/issues/18365
+		const markers_asset = await Asset.loadAsync(require('./assets/current/markers.txt'));
+		const markers_raw = await FileSystem.readAsStringAsync(markers_asset[0].localUri);
+		const markers = JSON.parse(markers_raw);
+		
 		let counties = [];
 		markers.features.forEach((feature) => {
 			if (counties.indexOf(feature.properties.county) == -1) {
@@ -126,58 +111,70 @@ export default class App extends React.Component {
 		});
 		counties.sort();
 		counties.forEach((feature) => {
-			global.counties.push({
+			GLOBAL.counties.push({
 				label: feature,
 				value: feature,
 			});
 		});
-		global.data_clean = markers.features;
-		// Handle location permissions and setting up listener
-		let { status } = await Location.requestForegroundPermissionsAsync();
-		if (status !== "granted") {
-			// Location permission not granted
-			global.location_permission = false;
-			global.data_clean.sort(sortArrayofObjects("title", "asc"));
-			global.location = false;
-		} else {
-			// Location permission granted
-			global.location_permission = true;
-			const GEOLOCATION_OPTIONS = { accuracy: Location.Accuracy.High, distanceInterval: 100 };
-			Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
-			DeviceEventEmitter.addListener("event.updateLocation", () => {
-				this.updateLocation();
-			});
-			this.updateLocation();
-		}
+		GLOBAL.data_clean = markers.features;
 		
+		// LOAD FILTERS
+		// Get list of favorites if saved to start filter preparation
+		let favorites = await AsyncStorage.getItem("favorites");
+		if (favorites == null) GLOBAL.favorites = [];
+		else GLOBAL.favorites = JSON.parse(favorites);
+		let empty = {
+			search: "",
+			favorites: "all",
+			county: "all",
+		};
+		let filter = await AsyncStorage.getItem("filter");
+		// If a filter was not saved, use clean data and do not run filtering logic
+		if (filter == null) {
+			GLOBAL.filter = empty;
+			GLOBAL.data = GLOBAL.data_clean;
+		}
+		else {
+			// If a filter was saved, parse and apply to data prior to rendering
+			GLOBAL.filter = JSON.parse(filter);
+			this.filterData();
+		}
+		// Add event listener for filter changes
+		DeviceEventEmitter.addListener("event.filterData", () => {
+			this.filterData();
+		});
 		this.setState({
 			dataLoaded: true,
+			filterLoaded: true
 		});
 	};
 
 	filterData = () => {
 		// Apply the filter
-		let filteredData = global.data_clean.filter((item) => {
+		let filteredData = GLOBAL.data_clean.filter((item) => {
 			let match = true;
 			// Favorites filter
-			if (global.filter.favorites != "all") {
-				if (global.favorites.indexOf(item.properties.marker_id) == -1)
+			if (GLOBAL.filter.favorites != "all") {
+				if (GLOBAL.favorites.indexOf(item.properties.marker_id) == -1)
 					match = false;
 			}
 			// County filter
-			if (global.filter.county != "all") {
-				if (item.properties.county != global.filter.county)
+			if (GLOBAL.filter.county != "all") {
+				if (item.properties.county != GLOBAL.filter.county)
 					match = false;
 			}
 			// Search filter
-			if (global.filter.search != "") {
+			if (GLOBAL.filter.search != "") {
 				const titleUpper = `${item.properties.title.toUpperCase()}`;
-				const valueUpper = global.filter.search.toUpperCase();
+				const valueUpper = GLOBAL.filter.search.toUpperCase();
 				if (titleUpper.indexOf(valueUpper) == -1) match = false;
 			}
 			return match;
 		});
-		global.data = filteredData;
+		if (GLOBAL.location != null && GLOBAL.location != false) this.sortByDistance(GLOBAL.location,filteredData);
+		GLOBAL.data = filteredData;
+		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data, refreshing: false});
+		if (GLOBAL.mapScreen != null) GLOBAL.mapScreen.setState({data: GLOBAL.data, region: bboxToRegion(getBbox(GLOBAL.data)), mapCount: GLOBAL.mapScreen.state.mapCount + 1 });
 	};
 
 	HomeTabs = () => {
@@ -191,26 +188,25 @@ export default class App extends React.Component {
 				<Tab.Screen
 					name="List"
 					component={MarkerListView}
-					filterData={this.filterData}
 					options={{
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons name="list" color={color} size={size} />
 						),
+						lazy: false
 					}}
 				/>
-				{this.state.deviceConnected ? (
+				{this.state.deviceOnline ? (
 					<Tab.Screen
 						name="Map"
 						component={MarkerMapView}
-						filterData={this.filterData}
 						options={{
 							tabBarIcon: ({ color, size }) => (
 								<Ionicons name="map" color={color} size={size} />
 							),
+							lazy: false
 						}}
 					/>
 				) : null}
-
 				<Tab.Screen
 					name="Settings"
 					component={SettingsView}
@@ -222,6 +218,7 @@ export default class App extends React.Component {
 								size={size}
 							/>
 						),
+						lazy: false
 					}}
 				/>
 			</Tab.Navigator>
@@ -230,39 +227,46 @@ export default class App extends React.Component {
 
 	loadConnectivity = () => {
 		NetInfo.addEventListener((state) => {
-			if (state.isConnected == true) {
-				this.setState({
-					deviceConnected: true,
-				});
-				global.online = true;
-			} else {
-				this.setState({
-					deviceConnected: false,
-				});
-				global.online = false;
-			}
+			if (state.isConnected == true) GLOBAL.online = true;
+			else GLOBAL.online = false;
+			this.setState({
+				deviceOnline: GLOBAL.online,
+			});
+			if (GLOBAL.settingsScreen != null) GLOBAL.settingsScreen.setState({deviceOnline: GLOBAL.online})
 		});
 	};
 	
 	locationChanged = (loc) => {
-		global.location = [loc.coords.longitude, loc.coords.latitude];
-		global.data_clean.forEach((feature) => {
+		if (GLOBAL.location != null) previous_location = GLOBAL.location;
+		else previous_location = [0,0];
+		GLOBAL.location = [loc.coords.longitude, loc.coords.latitude];
+		// Sort data only once available, and do not re-sort if location has not changed
+		if (GLOBAL.data != null && previous_location[0] != loc.coords.longitude && previous_location[1] != loc.coords.latitude)  {
+			GLOBAL.data = this.sortByDistance([loc.coords.longitude,loc.coords.latitude],GLOBAL.data);
+			if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data});
+		}
+		if (GLOBAL.listScreen != null) {
+			if (GLOBAL.listScreen.state.refreshing == true) GLOBAL.listScreen.setState({refreshing: false});
+		}
+	}
+	
+	sortByDistance = (loc, data) => {
+		data.forEach((feature) => {
 			let {d, b, bv} = haversine(
 				[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-				[loc.coords.longitude, loc.coords.latitude],
+				[loc[0], loc[1]]
 			);
 			feature.properties.distance = d;
 			feature.properties.bearing = b;
 			feature.properties.bearing_verbose = bv;
 		});
-		global.data_clean.sort(sortArrayofObjects("distance", "asc"));
-		DeviceEventEmitter.emit("event.filterData");
-		DeviceEventEmitter.emit("event.locationUpdated");
+		data.sort(sortArrayofObjects("distance", "asc"));
+		return data;
 	}
 	
 	// Facilitates location on launch and manual location updates (refresh pulldown)
 	updateLocation = async() => {
-		if (global.location == false)
+		if (GLOBAL.location == false)
 			loc = await Location.getLastKnownPositionAsync();
 		else
 			loc = await Location.getCurrentPositionAsync();
@@ -272,7 +276,8 @@ export default class App extends React.Component {
 	componentDidMount() {
 		this.loadConnectivity();
 		this.loadFonts();
-		this.loadFilter(); // finished by calling this.loadData()
+		this.loadImageSettings();
+		this.loadDataAndFilter();
 	}
 
 	render() {
@@ -281,10 +286,10 @@ export default class App extends React.Component {
 			this.state.dataLoaded &&
 			this.state.imageSettingsLoaded &&
 			this.state.filterLoaded &&
-			this.state.deviceConnected != null &&
-			global.location_permission != null
+			this.state.locationPermissionsLoaded &&
+			this.state.deviceOnline != null
+			
 		) {
-			this.filterData();
 			const headerStyles = {
 				headerStyle: {
 					backgroundColor: theme.primaryBackground,
@@ -299,7 +304,6 @@ export default class App extends React.Component {
 					fontFamily: theme.headerFont
 				}
 			};
-			SplashScreen.hideAsync();
 			return (
 				<NavigationContainer
 					theme={

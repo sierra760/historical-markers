@@ -15,11 +15,14 @@ import { ListItem } from "@rneui/base";
 import { useNavigation, NavigationContainer } from "@react-navigation/native";
 import { Button } from "@rneui/base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from 'expo-splash-screen';
 
 import MarkerFilterHeader from "./MarkerFilterHeader";
 import { sortArrayofObjects, formatDistance, haversine, fulfillWithTimeLimit } from "./utils";
 import { styles } from "./styles";
+
 import { region, theme } from "./regions";
+import GLOBAL from './global.js';
 
 export default class MarkerListView extends Component {
 	constructor(props) {
@@ -27,18 +30,14 @@ export default class MarkerListView extends Component {
 		this.state = {
 			error: null,
 			refreshing: false,
-			data: null,
+			data: GLOBAL.data,
 		};
+		GLOBAL.listScreen = this;
 	}
-
-	applyFilter = () => {
-		this.setState({ data: global.data });
-	};
 	
-	updateFromDetailView = () => {
-		if (global.filter.favorites == 'favorites') DeviceEventEmitter.emit("event.filterData");
-		this.applyFilter();
-	};
+	componentDidMount = () => {
+		SplashScreen.hideAsync();
+	}
 
 	_listEmptyComponent = () => {
 		return (
@@ -55,14 +54,6 @@ export default class MarkerListView extends Component {
 		DeviceEventEmitter.emit("event.updateLocation");
 	};
 
-	async componentDidMount() {
-		DeviceEventEmitter.addListener("event.locationUpdated", () => {
-			this.applyFilter();
-			this.setState({ refreshing: false });
-		});
-		this.applyFilter();
-	}
-
 	renderSeparator = () => {
 		return (
 			<View
@@ -76,30 +67,29 @@ export default class MarkerListView extends Component {
 	};
 
 	toggleFavorite = (marker_id) => {
-		if (global.favorites.indexOf(marker_id) == -1) {
-			global.favorites.push(marker_id);
+		if (GLOBAL.favorites.indexOf(marker_id) == -1) {
+			GLOBAL.favorites.push(marker_id);
 		} else {
-			global.favorites = global.favorites.filter(
+			GLOBAL.favorites = GLOBAL.favorites.filter(
 				(item) => item !== marker_id,
 			);
 		}
 		AsyncStorage.setItem(
 			"favorites",
-			JSON.stringify(global.favorites),
+			JSON.stringify(GLOBAL.favorites),
 		);
-		if (global.filter.favorites == 'favorites') DeviceEventEmitter.emit("event.filterData");
-		this.applyFilter();
+		DeviceEventEmitter.emit("event.filterData");
 	};
 
 	renderItem = ({ item }) => {
 		const favoriteIcon = (marker_id) => {
-			if (global.favorites.indexOf(marker_id) != -1) return "favorite";
+			if (GLOBAL.favorites.indexOf(marker_id) != -1) return "favorite";
 			else return "favorite-border";
 		};
 		let subtitle = item.properties.county;
 		let distance = Number(item.properties.distance);
 		let unit = "miles";
-		if (global.location != false && global.location != null && global.location != true) {
+		if (GLOBAL.location != false && GLOBAL.location != null && GLOBAL.location != true) {
 			renderedDistance = formatDistance(distance);
 			subtitle = `${subtitle}   |   ${renderedDistance} ${item.properties.bearing}`;
 		}
@@ -109,10 +99,9 @@ export default class MarkerListView extends Component {
 		let payload = {
 			properties: item.properties,
 			latitude: item.geometry.coordinates[1],
-			longitude: item.geometry.coordinates[0],
-			updateLastView: () => this.updateFromDetailView()
+			longitude: item.geometry.coordinates[0]
 		};
-		if (global.favorites.indexOf(item.properties.marker_id) > -1)
+		if (GLOBAL.favorites.indexOf(item.properties.marker_id) > -1)
 			rowStyle = styles.listFavorite;
 		else rowStyle = styles.listNonfavorite;
 		return (
@@ -165,14 +154,14 @@ export default class MarkerListView extends Component {
 				}}
 			>
 				<FlatList
-					bounces={global.location_permission}
+					bounces={GLOBAL.location_permission}
 					data={this.state.data}
 					keyExtractor={(item) => item.properties.marker_id}
 					ListEmptyComponent={this._listEmptyComponent}
 					renderItem={this.renderItem}
 					ItemSeparatorComponent={this.renderSeparator}
 					ListHeaderComponent={
-						<MarkerFilterHeader applyFilter={this.applyFilter} />
+						<MarkerFilterHeader />
 					}
 					initialNumToRender={20}
 					stickyHeaderIndices={[0]}

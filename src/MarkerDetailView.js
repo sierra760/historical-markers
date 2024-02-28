@@ -10,7 +10,8 @@ import {
 	Text,
 	Dimensions,
 	Linking,
-	TouchableHighlight
+	TouchableHighlight,
+	DeviceEventEmitter
 } from "react-native";
 import * as Speech from "expo-speech";
 import { showLocation } from "react-native-map-link";
@@ -23,8 +24,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from 'expo-file-system';
 
 import { styles } from "./styles";
-import { region, theme } from "./regions";
 import { formatDistance, haversine, capitalizeFirstLetter } from "./utils";
+
+import { region, theme } from "./regions";
+import GLOBAL from './global.js';
 
 export default class MarkerDetailView extends Component {
 	constructor(props) {
@@ -73,20 +76,20 @@ export default class MarkerDetailView extends Component {
 	};
 	
 	toggleFavorite = () => {
-		if (global.favorites.indexOf(this.props.route.params.properties.marker_id) == -1) {
-			global.favorites.push(this.props.route.params.properties.marker_id);
+		if (GLOBAL.favorites.indexOf(this.props.route.params.properties.marker_id) == -1) {
+			GLOBAL.favorites.push(this.props.route.params.properties.marker_id);
 		}
 		else {
-			global.favorites = global.favorites.filter(
+			GLOBAL.favorites = GLOBAL.favorites.filter(
 				(item) => item !== this.props.route.params.properties.marker_id,
 			);
 		}
 		AsyncStorage.setItem(
 			"favorites",
-			JSON.stringify(global.favorites),
+			JSON.stringify(GLOBAL.favorites),
 		);
 		this.forceUpdate();
-		this.props.route.params.updateLastView();
+		DeviceEventEmitter.emit("event.filterData");
 	};
 	
 	showLightbox = (i) => {
@@ -95,6 +98,11 @@ export default class MarkerDetailView extends Component {
 	
 	hideLightbox = () => {
 		this.setState({ lightboxVisible: false })
+	}
+	
+	photosVisible = () => {
+		if (GLOBAL.images_downloaded == true || GLOBAL.online == true) return true;
+		else return false;
 	}
 
 	render() {
@@ -110,35 +118,40 @@ export default class MarkerDetailView extends Component {
 						this.props.route.params.properties.photos.length,
 				)
 			];
-		if (global.location != false) {
+		if (GLOBAL.location != false) {
 			let {d, b, bv} = haversine(
 				[this.props.route.params.longitude, this.props.route.params.latitude],
-				[global.location[0], global.location[1]]
+				[GLOBAL.location[0], GLOBAL.location[1]]
 			);
 			this.props.route.params.properties.distance = d;
 			this.props.route.params.properties.bearing = b;
 			this.props.route.params.properties.bearing_verbose = bv;
 		}
-		if (global.images_downloaded == true) img_url_prefix = FileSystem.documentDirectory + region.abbr_lower;
-		else img_url_prefix = `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed`;
 		let lightbox_photos = [];
-		this.props.route.params.properties.photos.forEach((photo) => {
-			if (global.images_downloaded == true) lightbox_photos.push({uri: FileSystem.documentDirectory + `${region.abbr_lower}/${photo.filename}`})
-    		else lightbox_photos.push({uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed/${photo.filename}`});
-    	});
-    	if (this.props.route.params.properties.photos.length > 0) {
-    		if (global.images_downloaded == true) imageSource = {uri: FileSystem.documentDirectory + `${region.abbr_lower}/${bgImage.filename}`};
-    		else imageSource = {uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed/${bgImage.filename}`};
+		if (this.photosVisible() == true) {
+			if (GLOBAL.images_downloaded == true) img_url_prefix = FileSystem.documentDirectory + region.abbr_lower;
+			else img_url_prefix = `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed`;
+			this.props.route.params.properties.photos.forEach((photo) => {
+				if (GLOBAL.images_downloaded == true) lightbox_photos.push({uri: FileSystem.documentDirectory + `${region.abbr_lower}/${photo.filename}`})
+				else lightbox_photos.push({uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed/${photo.filename}`});
+			});
+			if (this.props.route.params.properties.photos.length > 0) {
+				if (GLOBAL.images_downloaded == true) imageSource = {uri: FileSystem.documentDirectory + `${region.abbr_lower}/${bgImage.filename}`};
+				else imageSource = {uri: `http://historical-markers.s3-website-us-west-1.amazonaws.com/${region.abbr_lower}/photos_compressed/${bgImage.filename}`};
+			}
+			else imageSource = 'none';
     	}
     	else imageSource = 'none';
 		return (
 			<View>
+				{this.photosVisible() == true ? (
 				<ImageView
 					images={lightbox_photos}
 					imageIndex={this.state.lightboxImageIndex}
 					visible={this.state.lightboxVisible}
 					onRequestClose={() => this.hideLightbox()}
 				/>
+				) : null }
 				<ScrollView style={styles.modalContainer} vertical bounces={false}>
 					<View style={styles.modalHero}>
 						<ImageBackground
@@ -150,7 +163,7 @@ export default class MarkerDetailView extends Component {
 						>
 							<View style={styles.modalHeroFavoriteIconWrapper}>
 								<TouchableHighlight onPress={this.toggleFavorite} underlayColor={"none"}>
-									{global.favorites.indexOf(this.props.route.params.properties.marker_id) > -1 ? (
+									{GLOBAL.favorites.indexOf(this.props.route.params.properties.marker_id) > -1 ? (
 											<Ionicons name="heart" style={styles.modalHeroFavoriteIcon} />
 								
 									) : (
@@ -186,7 +199,7 @@ export default class MarkerDetailView extends Component {
 							</View>
 						</ImageBackground>
 					</View>
-					{global.online ? (
+					{GLOBAL.online ? (
 						<View style={styles.modalMapContainer}>
 							<MapView
 								style={styles.modalMap}
@@ -251,6 +264,9 @@ export default class MarkerDetailView extends Component {
 							/>
 						</View>
 					</View>
+					{GLOBAL.online == false ? (
+						<View style={styles.modalSpacer}></View>
+					) : null }
 					<View style={styles.modalTextContainer}>
 						<Text style={styles.modalHeading}>Description</Text>
 						<Text style={styles.modalText}>
@@ -312,69 +328,74 @@ export default class MarkerDetailView extends Component {
 					) : (
 						<View></View>
 					)}
-					<View style={styles.modalImageContainer}>
-						{this.props.route.params.properties.photos.map(
-							(photo, i) => (
-								<TouchableHighlight onPress={() => this.showLightbox(i)} underlayColor={"none"}>
-									<View style={styles.modalImageBox}>
-										<View
-											style={{
-												borderRadius: 16,
-												width:
-													win.width -
-													styles.modalImageBox.marginLeft -
-													styles.modalImageBox.marginRight -
-													styles.modalImageBox.padding * 2,
-												height:
-													(win.width -
-														styles.modalImageBox
-															.marginLeft -
-														styles.modalImageBox
-															.marginRight -
-														styles.modalImageBox.padding *
-															2) /
-													photo.aspect,
-											}}
-										>
-											<Image
+					{this.photosVisible() == false ? (
+						<View style={styles.modalSpacer}></View>
+					) : null }
+					{this.photosVisible() ? (
+						<View style={styles.modalImageContainer}>
+							{this.props.route.params.properties.photos.map(
+								(photo, i) => (
+									<TouchableHighlight onPress={() => this.showLightbox(i)} underlayColor={"none"}>
+										<View style={styles.modalImageBox}>
+											<View
 												style={{
 													borderRadius: 16,
-													width: "100%",
-													height: "100%",
+													width:
+														win.width -
+														styles.modalImageBox.marginLeft -
+														styles.modalImageBox.marginRight -
+														styles.modalImageBox.padding * 2,
+													height:
+														(win.width -
+															styles.modalImageBox
+																.marginLeft -
+															styles.modalImageBox
+																.marginRight -
+															styles.modalImageBox.padding *
+																2) /
+														photo.aspect,
 												}}
-												source={
-													`${img_url_prefix}/${photo.filename}` 
-												}
-												resizeMethod="resize"
-												resizeMode="contain"
-											/>
+											>
+												<Image
+													style={{
+														borderRadius: 16,
+														width: "100%",
+														height: "100%",
+													}}
+													source={
+														`${img_url_prefix}/${photo.filename}` 
+													}
+													resizeMethod="resize"
+													resizeMode="contain"
+												/>
+											</View>
+											{photo.caption ? (
+												<Text style={styles.modalImageCaption}>
+													{photo.caption}
+												</Text>
+											) : (
+												""
+											)}
+											{photo.subcaption ? (
+												<Text style={styles.modalImageSubcaption}>
+													{photo.subcaption}
+												</Text>
+											) : (
+												""
+											)}
+											{photo.submitted ? (
+												<Text style={styles.modalImageCredit}>
+													Submitted to HMDB.org: {photo.submitted}
+												</Text>
+											) : (
+												""
+											)}
 										</View>
-										{photo.caption ? (
-											<Text style={styles.modalImageCaption}>
-												{photo.caption}
-											</Text>
-										) : (
-											""
-										)}
-										{photo.subcaption ? (
-											<Text style={styles.modalImageSubcaption}>
-												{photo.subcaption}
-											</Text>
-										) : (
-											""
-										)}
-										{photo.submitted ? (
-											<Text style={styles.modalImageCredit}>
-												Submitted to HMDB.org: {photo.submitted}
-											</Text>
-										) : (
-											""
-										)}
-									</View>
-								</TouchableHighlight>
-							),
-						)}
-					</View>
+									</TouchableHighlight>
+								),
+							)}
+						</View>
+					) : null }
 				</ScrollView>
 			</View>
 		);

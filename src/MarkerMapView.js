@@ -13,7 +13,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MarkerFilterHeader from "./MarkerFilterHeader";
 import { getBbox, bboxToRegion } from "./utils";
 import { styles } from "./styles";
+
 import { region, theme } from "./regions";
+import GLOBAL from './global.js';
+
 import counties_geom from '../assets/current/counties_geom.json';
 
 export default class MarkerMapView extends React.Component {
@@ -21,27 +24,24 @@ export default class MarkerMapView extends React.Component {
 		super(props);
 		this.state = {
 			mapCount: 0,
-			data: global.data,
-			mapType: 'mutedStandard'
+			data: GLOBAL.data,
+			mapType: 'mutedStandard',
+			region: bboxToRegion(getBbox(GLOBAL.data))
 		};
+		GLOBAL.mapScreen = this;
 	}
-
-	applyFilter = () => {
-		DeviceEventEmitter.emit("event.filterData");
-		this.setState({ mapCount: this.state.mapCount + 1, data: global.data });
-	};
 
 	render() {
 		return (
 			<View style={{ flex: 1 }}>
 				<View>
-					<MarkerFilterHeader applyFilter={this.applyFilter} />
+					<MarkerFilterHeader />
 				</View>
 				<View style={{ flex: 1 }}>
 					<MapView
 						key={this.state.mapCount}
 						style={styles.map}
-						initialRegion={bboxToRegion(getBbox(this.state.data))}
+						region={this.state.region}
 						mapType={this.state.mapType}
 						loadingEnabled={true}
 						showsUserLocation={true}

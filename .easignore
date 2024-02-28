@@ -34,11 +34,5 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
-
-# proprietary assets
-retrieval/
-assets_original/
-assets/**/markers.json
-photos_compressed/
-!assets/ca/photos_compressed/
-!assets/ca/markers.json
+!assets/az/photos_compressed/
+!assets/az/markers.json

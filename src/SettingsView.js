@@ -8,9 +8,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from 'expo-file-system';
 import { unzip } from "react-native-zip-archive";
 
-import { region, theme } from "./regions";
 import { friendlyFileSize } from "./utils";
 import { styles } from "./styles";
+
+import { region, theme } from "./regions";
+import GLOBAL from './global.js';
 
 export default class SettingsView extends React.Component {
 
@@ -19,20 +21,22 @@ export default class SettingsView extends React.Component {
 		this.download = null;
 		this.update_counter = 0;
 		this.state = {
-			progress: null
+			progress: null,
+			deviceOnline: GLOBAL.online
 		};
+		GLOBAL.settingsScreen = this;
 	}
 	
 	setImagesDownloaded = (status) => {
 		AsyncStorage.setItem("images_downloaded", JSON.stringify(status));
-		global.images_downloaded = status;
+		GLOBAL.images_downloaded = status;
 		this.download = null;
 		this.setState({progress: null});
 	}
 	
 	setDownloadImages = (status) => {
 		AsyncStorage.setItem("download_images", JSON.stringify(status));
-		global.download_images = status;
+		GLOBAL.download_images = status;
 	}
 
 	downloadProgressUpdate = (downloadProgress) => {
@@ -58,10 +62,10 @@ export default class SettingsView extends React.Component {
 		// Save setting before proceeding
 		this.setDownloadImages(value);
 		// Executed when switch is toggled on
-		if (global.download_images == true) {
+		if (GLOBAL.download_images == true) {
 			this.forceUpdate();
 			// Download region's image archive
-			if (global.images_downloaded == false && this.download == null) {
+			if (GLOBAL.images_downloaded == false && this.download == null) {
 				try {
 					this.download = FileSystem.createDownloadResumable(
 						`http://historical-markers.s3-website-us-west-1.amazonaws.com/downloads/${region.abbr_lower}.zip`,
@@ -89,7 +93,7 @@ export default class SettingsView extends React.Component {
 				FileSystem.deleteAsync(FileSystem.documentDirectory + 'images.zip');
 				this.setImagesDownloaded(false);
 			}
-			if (global.images_downloaded == true) {
+			if (GLOBAL.images_downloaded == true) {
 				Alert.alert('Delete all downloaded images?',`All available photos of historical markers in ${region.name} are currently stored on your device.  Storing images on your device lets you view them even if your device is offline.  If you choose to proceed, all marker images will be removed from your device and approximately ${region.downloadSize} of storage will be freed.  You will still be able to view images of historical markers as long as your device is online.`,
 				[
 					{
@@ -114,7 +118,7 @@ export default class SettingsView extends React.Component {
 	};
 	
 	componentDidMount = async() => {
-		if (global.download_images == true && global.images_downloaded == false) this.toggleImageDownload(true);
+		if (GLOBAL.download_images == true && GLOBAL.images_downloaded == false) this.toggleImageDownload(true);
 	}
 
 	render() {
@@ -134,13 +138,20 @@ export default class SettingsView extends React.Component {
 						<View style={{ flexDirection: 'row' }}>
 							<Switch
 								style={{marginTop: 5}}
+								disabled={GLOBAL.online == false}
 								trackColor={{false: theme.primaryBackgroundDarkest, true: theme.splashBackground}}
 								ios_backgroundColor={'rgba(0,0,0,0.25)'}
-								value={global.download_images}
+								value={GLOBAL.download_images}
 								onValueChange={(value) => this.toggleImageDownload(value)}
 							/>
 							<Text style={styles.settingsSwitchLabel}>Store Marker Photos on Device{"\n"}({region.downloadSize} storage required)</Text>
 						</View>
+						{GLOBAL.online == false
+							?	<View style={styles.settingsProgressBar}>
+									<Text style={styles.settingsProgressLabel}>Your device is currently offline.  This setting can be changed only when your device is online.</Text>
+								</View>
+							: null
+						}
 						{this.state.progress != null && this.state.progress != 'unzip'
 							?	<View style={styles.settingsProgressBar}>
 									<Text style={styles.settingsProgressLabel}>{friendlyFileSize(this.state.progress.totalBytesWritten)} of {friendlyFileSize(this.state.progress.totalBytesExpectedToWrite)} transferred ({Math.round(this.state.progress.totalBytesWritten / this.state.progress.totalBytesExpectedToWrite * 1000) / 10}%)</Text>
@@ -159,7 +170,7 @@ export default class SettingsView extends React.Component {
 								</View>
 							: null
 						}
-						{global.images_downloaded == true
+						{GLOBAL.images_downloaded == true
 							?	<View style={styles.settingsProgressBar}>
 									<Text style={styles.settingsProgressLabel}>All marker images are currently stored on your device.</Text>
 								</View>
@@ -198,6 +209,7 @@ export default class SettingsView extends React.Component {
 						See the GNU General Public License for more details.
 					</Text>
 				</View>
+				<View style={styles.modalSpacer}></View>
 			</ScrollView>
 		);
 	}

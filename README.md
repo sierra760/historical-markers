@@ -30,11 +30,11 @@ Note that while this app is and always will be free and open source, most of the
 
 ## Roadmap
 
-The developer plans the following improvements for the app's next minor version:
+The developer plans the following improvements for the app's next major version:
 
-- Refactor to avoid use of global variables (no judgement please!)
-- Conduct testing on Android devices and correct any related issues
-- General code audit and clean-up to reflect best practices of React Native development (this is the developer's first solo mobile app and the current codebase is disorganized and probably violates a bunch of optimal practices for using React Native)
+- Conduct testing on Android devices and correct any related issues prior to releasing on Google Play Store
+- General code audit and clean-up to reflect best practices of React Native development (current codebase is disorganized and probably violates a bunch of optimal practices for using React Native)
+- Experiment with AR mode with a focus upon improving accessibility of marker information (i.e., users will be able to point their devices at historical markers to view or hear the marker information without having to physically approach the marker)
 
 ## Screenshots
 
@@ -58,7 +58,7 @@ Then, use expo to install dependencies:
 npm install
 ```
 
-Note that since this project offers support for creating apps for multiple regions from a single codebase, the state of Nevada is used as the default region for this repository.  You can change the region at any time by running a shell script in the root directory of this repository that applies the necessary configuration changes.  For example, the following command switches configuration to the state of Colorado (two-letter abbreviation "co"):
+Note that since this project offers support for creating apps for multiple regions from a single codebase, the state of Nevada is used as the default region for this repository.  You can change the region at any time by running a shell script in the root directory of this repository that applies the necessary configuration changes.  For example, the following command switches configuration to the state of Nevada (two-letter abbreviation "nv"):
 
 ```bash
 ./select_region.sh nv

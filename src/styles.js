@@ -177,6 +177,9 @@ export const styles = StyleSheet.create({
 		fontFamily: theme.bodyFont,
 		textDecorationLine: "underline",
 	},
+	modalSpacer: {
+		marginBottom: 20
+	},
 	aboutText: {
 		textAlign: "left",
 		fontSize: 18,

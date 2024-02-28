@@ -10,19 +10,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import RNPickerSelect from 'react-native-picker-select';
 
 import { styles, filterSelectStyles } from "./styles";
+
 import { region, theme } from "./regions";
+import GLOBAL from './global.js';
 
 export default class MarkerFilterHeader extends React.Component {
 	changeFilter = (f, value) => {
 		// Filter favorites
-		if (f == "favorites") global.filter.favorites = value;
+		if (f == "favorites") GLOBAL.filter.favorites = value;
 		// Filter by county
-		if (f == "county") global.filter.county = value;
+		if (f == "county") GLOBAL.filter.county = value;
 		// Handle search bar
-		if (f == "search") global.filter.search = value;
-		AsyncStorage.setItem("filter", JSON.stringify(global.filter));
+		if (f == "search") GLOBAL.filter.search = value;
+		AsyncStorage.setItem("filter", JSON.stringify(GLOBAL.filter));
 		DeviceEventEmitter.emit("event.filterData");
-		this.props.applyFilter();
 	};
 
 	render() {
@@ -41,14 +42,14 @@ export default class MarkerFilterHeader extends React.Component {
 					round
 					onChangeText={(text) => this.changeFilter("search", text)}
 					autoCorrect={false}
-					value={global.filter.search}
+					value={GLOBAL.filter.search}
 				/>
 				
 				<View style={styles.filterWrapper}>
 					<RNPickerSelect
 						placeholder={{}}
 						onValueChange={(value) => this.changeFilter("favorites", value)}
-						value={global.filter.favorites}
+						value={GLOBAL.filter.favorites}
 						style={filterSelectStyles}
 						items={[
 							{ label: "All Markers", value: 'all' },
@@ -71,8 +72,8 @@ export default class MarkerFilterHeader extends React.Component {
 							}
 						}}
 						onValueChange={(value) => this.changeFilter("county", value)}
-						value={global.filter.county}
-						items={global.counties}
+						value={GLOBAL.filter.county}
+						items={GLOBAL.counties}
 						useNativeAndroidPickerStyle={false}
 						Icon={() => {
 							return <Ionicons name="chevron-down-outline" size={16} color={theme.lightOnBackground} />;
