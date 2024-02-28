@@ -1,1 +1,1 @@
-export const selectedRegion = 'az';
+export const selectedRegion = 'nm';

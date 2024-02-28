@@ -139,7 +139,7 @@ export default class SettingsView extends React.Component {
 							<Switch
 								style={{marginTop: 5}}
 								disabled={GLOBAL.online == false}
-								trackColor={{false: theme.primaryBackgroundDarkest, true: theme.splashBackground}}
+								trackColor={{false: theme.primaryBackgroundDarkest, true: theme.switchActiveColor}}
 								ios_backgroundColor={'rgba(0,0,0,0.25)'}
 								value={GLOBAL.download_images}
 								onValueChange={(value) => this.toggleImageDownload(value)}

@@ -108,6 +108,7 @@ export default class App extends React.Component {
 			if (counties.indexOf(feature.properties.county) == -1) {
 				counties.push(feature.properties.county);
 			}
+			feature.properties.title_upper = feature.properties.title.toUpperCase();
 		});
 		counties.sort();
 		counties.forEach((feature) => {
@@ -151,26 +152,27 @@ export default class App extends React.Component {
 
 	filterData = () => {
 		// Apply the filter
-		let filteredData = GLOBAL.data_clean.filter((item) => {
+		let filteredData = [];
+		for (i = 0; i < GLOBAL.data_clean.length; i++) {
 			let match = true;
 			// Favorites filter
 			if (GLOBAL.filter.favorites != "all") {
-				if (GLOBAL.favorites.indexOf(item.properties.marker_id) == -1)
+				if (GLOBAL.favorites.indexOf(GLOBAL.data_clean[i].properties.marker_id) == -1)
 					match = false;
 			}
 			// County filter
 			if (GLOBAL.filter.county != "all") {
-				if (item.properties.county != GLOBAL.filter.county)
+				if (GLOBAL.data_clean[i].properties.county != GLOBAL.filter.county)
 					match = false;
 			}
 			// Search filter
 			if (GLOBAL.filter.search != "") {
-				const titleUpper = `${item.properties.title.toUpperCase()}`;
+				const titleUpper = GLOBAL.data_clean[i].properties.title_upper;
 				const valueUpper = GLOBAL.filter.search.toUpperCase();
 				if (titleUpper.indexOf(valueUpper) == -1) match = false;
 			}
-			return match;
-		});
+			if (match == true) filteredData.push(GLOBAL.data_clean[i]);
+		}
 		if (GLOBAL.location != null && GLOBAL.location != false) this.sortByDistance(GLOBAL.location,filteredData);
 		GLOBAL.data = filteredData;
 		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data, refreshing: false});
@@ -245,9 +247,7 @@ export default class App extends React.Component {
 			GLOBAL.data = this.sortByDistance([loc.coords.longitude,loc.coords.latitude],GLOBAL.data);
 			if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data});
 		}
-		if (GLOBAL.listScreen != null) {
-			if (GLOBAL.listScreen.state.refreshing == true) GLOBAL.listScreen.setState({refreshing: false});
-		}
+		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({refreshing: false});
 	}
 	
 	sortByDistance = (loc, data) => {
@@ -266,7 +266,7 @@ export default class App extends React.Component {
 	
 	// Facilitates location on launch and manual location updates (refresh pulldown)
 	updateLocation = async() => {
-		if (GLOBAL.location == false)
+		if (GLOBAL.location == null)
 			loc = await Location.getLastKnownPositionAsync();
 		else
 			loc = await Location.getCurrentPositionAsync();

@@ -14,7 +14,7 @@ const regions = {
 		abbr_lower: "nv",
 		nickname: "Silver State",
 		statewideMapExtent: {lat_min: 35.003, lat_max: 42.003, lon_min: -120.0037, lon_max: -114.0436},
-		aboutSplashWidth: 0.912109375,
+		aboutSplashWidth: 0.620229007633588,
 		downloadSize: '360 MB',
 		light: {
 			activeTabBackground: "#005a9c",
@@ -27,7 +27,7 @@ const regions = {
 			lighterOnBackground: "#d6e8f5",
 			contrastOnBackground: "#d6e8f5",
 			contrastOnSplashBackground: "#ffffff",
-			splashBackground: "#519fbb",
+			splashBackground: "#004b83",
 			listBackground: "#ffffff",
 			headerFont: "Rye",
 			subheaderFont: "AsapCondensed",
@@ -39,6 +39,7 @@ const regions = {
 			highlightedRow: "#dfedf7",
 			separatorColor: "#CED0CE",
 			modalHeader: "#666666",
+			switchActiveColor: "#0069b6"
 		},
 		dark: {
 			activeTabBackground: "#aed1ea",
@@ -51,7 +52,7 @@ const regions = {
 			lighterOnBackground: "#d6e8f5",
 			contrastOnBackground: "#d6e8f5",
 			contrastOnSplashBackground: "#ffffff",
-			splashBackground: "#519fbb",
+			splashBackground: "#004b83",
 			listBackground: "#333333",
 			headerFont: "Rye",
 			subheaderFont: "AsapCondensed",
@@ -64,6 +65,7 @@ const regions = {
 			separatorColor: "#666666",
 			modalBackground: "#444444",
 			modalHeader: "#aaaaaa",
+			switchActiveColor: "#0069b6"
 		}
 	},
 	nm: {
@@ -97,6 +99,7 @@ const regions = {
 			highlightedRow: "#E0EDF0",
 			separatorColor: "#CED0CE",
 			modalHeader: "#666666",
+			switchActiveColor: "#D8DFD6"
 		},
 		dark: {
 			activeTabBackground: "#C9E1E6",
@@ -122,6 +125,7 @@ const regions = {
 			separatorColor: "#666666",
 			modalBackground: "#444444",
 			modalHeader: "#aaaaaa",
+			switchActiveColor: "#D8DFD6"
 		}
 	},
 	ca: {
@@ -154,6 +158,7 @@ const regions = {
 			highlightedRow: "#dfedf7",
 			separatorColor: "#CED0CE",
 			modalHeader: "#666666",
+			switchActiveColor: "#d6e8f5"
 		},
 		dark: {
 			primaryBackground: "#005a9c",
@@ -165,7 +170,7 @@ const regions = {
 			lighterOnBackground: "#d6e8f5",
 			contrastOnBackground: "#ffffff",
 			contrastOnSplashBackground: "#444444",
-			splashBackground: "#519fbb",
+			splashBackground: "#b6d6e2",
 			listBackground: "#333333",
 			headerFont: "Pacifico",
 			subheaderFont: "AsapCondensed",
@@ -177,7 +182,8 @@ const regions = {
 			highlightedRow: "#666666",
 			separatorColor: "#666666",
 			modalBackground: "#444444",
-			modalHeader: "#aaaaaa"
+			modalHeader: "#aaaaaa",
+			switchActiveColor: "#d6e8f5"
 		}
 	},
 	co: {
@@ -211,6 +217,7 @@ const regions = {
 			highlightedRow: "#FDFBF8",
 			separatorColor: "#CED0CE",
 			modalHeader: "#666666",
+			switchActiveColor: "#f5f2ec"
 		},
 		dark: {
 			activeTabBackground: "#FDFBF8",
@@ -236,6 +243,7 @@ const regions = {
 			separatorColor: "#666666",
 			modalBackground: "#444444",
 			modalHeader: "#aaaaaa",
+			switchActiveColor: "#9C8546"
 		}
 	},
 	az: {
@@ -269,6 +277,7 @@ const regions = {
 			highlightedRow: "#FFFBED",
 			separatorColor: "#CED0CE",
 			modalHeader: "#666666",
+			switchActiveColor: "#fef6d4"
 		},
 		dark: {
 			activeTabBackground: "#fef6d4",
@@ -294,6 +303,7 @@ const regions = {
 			separatorColor: "#666666",
 			modalBackground: "#444444",
 			modalHeader: "#aaaaaa",
+			switchActiveColor: "#fef6d4"
 		}
 	},
 	mt: {
@@ -327,6 +337,7 @@ const regions = {
 			highlightedRow: "#d6dce7",
 			separatorColor: "#CED0CE",
 			modalHeader: "#666666",
+			switchActiveColor: "#8EC6C6"
 		},
 		dark: {
 			activeTabBackground: "#c2cbdb",
@@ -352,6 +363,7 @@ const regions = {
 			separatorColor: "#666666",
 			modalBackground: "#444444",
 			modalHeader: "#aaaaaa",
+			switchActiveColor: "#8EC6C6"
 		}
 	},
 }
