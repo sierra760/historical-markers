@@ -20,5 +20,6 @@ module.exports = {
 	images_downloaded: null,
 	location_permission: null,
 	location: null,
+	location_lastsorted: [-999,-999],
 	online: null
 };

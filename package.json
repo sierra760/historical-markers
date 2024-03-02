@@ -21,7 +21,7 @@
     "expo-dev-client": "~3.3.9",
     "expo-file-system": "~16.0.6",
     "expo-image": "~1.10.6",
-    "expo-location": "~16.5.4",
+    "expo-location": "~16.5.5",
     "expo-speech": "~11.7.0",
     "expo-splash-screen": "~0.26.4",
     "expo-status-bar": "~1.11.1",

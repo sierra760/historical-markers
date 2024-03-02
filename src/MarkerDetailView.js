@@ -156,7 +156,7 @@ export default class MarkerDetailView extends Component {
 					<View style={styles.modalHero}>
 						<ImageBackground
 							style={styles.modalHeroBackground}
-							resizeMode="cover"
+							contentFit="cover"
 							source={imageSource}
 							blurRadius={5}
 							imageStyle={{ opacity: 0.2 }}
@@ -365,8 +365,7 @@ export default class MarkerDetailView extends Component {
 													source={
 														`${img_url_prefix}/${photo.filename}` 
 													}
-													resizeMethod="resize"
-													resizeMode="contain"
+													contentFit="contain"
 												/>
 											</View>
 											{photo.caption ? (

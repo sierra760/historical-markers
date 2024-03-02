@@ -174,7 +174,7 @@ export default class App extends React.Component {
 			}
 			if (match == true) filteredData.push(GLOBAL.data_clean[i]);
 		}
-		if (GLOBAL.location != null && GLOBAL.location != false) this.sortByDistance(GLOBAL.location,filteredData);
+		if (GLOBAL.location_permission == true && GLOBAL.location != null && GLOBAL.location != false) this.sortByDistance(GLOBAL.location,filteredData);
 		GLOBAL.data = filteredData;
 		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data, refreshing: false});
 		if (GLOBAL.mapScreen != null) GLOBAL.mapScreen.setState({data: GLOBAL.data, region: bboxToRegion(getBbox(GLOBAL.data)), mapCount: GLOBAL.mapScreen.state.mapCount + 1 });
@@ -241,8 +241,9 @@ export default class App extends React.Component {
 	
 	locationChanged = (loc) => {
 		GLOBAL.location = [loc.coords.longitude, loc.coords.latitude];
-		// Sort data only once available
-		if (GLOBAL.data != null)  {
+		// Sort data only once available, and sort by distance only if the current location is actually different from the last time data were sorted
+		if (GLOBAL.data != null && (GLOBAL.location_lastsorted[0] != GLOBAL.location[0] && GLOBAL.location_lastsorted[1] != GLOBAL.location[1]))  {
+			GLOBAL.location_lastsorted = GLOBAL.location;
 			GLOBAL.data = this.sortByDistance([loc.coords.longitude,loc.coords.latitude],GLOBAL.data);
 			if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data});
 		}
