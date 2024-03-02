@@ -144,6 +144,7 @@ export default class App extends React.Component {
 		DeviceEventEmitter.addListener("event.filterData", () => {
 			this.filterData();
 		});
+		if (GLOBAL.location_permission == true) await this.updateLocation();
 		this.setState({
 			dataLoaded: true,
 			filterLoaded: true
@@ -239,11 +240,9 @@ export default class App extends React.Component {
 	};
 	
 	locationChanged = (loc) => {
-		if (GLOBAL.location != null) previous_location = GLOBAL.location;
-		else previous_location = [0,0];
 		GLOBAL.location = [loc.coords.longitude, loc.coords.latitude];
-		// Sort data only once available, and do not re-sort if location has not changed
-		if (GLOBAL.data != null && previous_location[0] != loc.coords.longitude && previous_location[1] != loc.coords.latitude)  {
+		// Sort data only once available
+		if (GLOBAL.data != null)  {
 			GLOBAL.data = this.sortByDistance([loc.coords.longitude,loc.coords.latitude],GLOBAL.data);
 			if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data});
 		}

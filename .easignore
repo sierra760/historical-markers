@@ -34,5 +34,5 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
-!assets/nm/photos_compressed/
-!assets/nm/markers.json
+!assets/nv/photos_compressed/
+!assets/nv/markers.json
