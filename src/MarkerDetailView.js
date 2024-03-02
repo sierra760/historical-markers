@@ -37,6 +37,7 @@ export default class MarkerDetailView extends Component {
 			lightboxVisible: false,
 			lightboxImageIndex: 0
 		};
+		GLOBAL.modalScreen = this;
 	}
 
 	speakModal = async (title, description) => {
@@ -118,7 +119,7 @@ export default class MarkerDetailView extends Component {
 						this.props.route.params.properties.photos.length,
 				)
 			];
-		if (GLOBAL.location != false) {
+		if (GLOBAL.location != false && GLOBAL.location_permission == true) {
 			let {d, b, bv} = haversine(
 				[this.props.route.params.longitude, this.props.route.params.latitude],
 				[GLOBAL.location[0], GLOBAL.location[1]]

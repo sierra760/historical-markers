@@ -89,7 +89,7 @@ export default class MarkerListView extends Component {
 		let subtitle = item.properties.county;
 		let distance = Number(item.properties.distance);
 		let unit = "miles";
-		if (GLOBAL.location != false && GLOBAL.location != null && GLOBAL.location != true) {
+		if (GLOBAL.location != false && GLOBAL.location != null && GLOBAL.location != true && GLOBAL.location_permission == true) {
 			renderedDistance = formatDistance(distance);
 			subtitle = `${subtitle}   |   ${renderedDistance} ${item.properties.bearing}`;
 		}
@@ -169,7 +169,7 @@ export default class MarkerListView extends Component {
 						<RefreshControl
 							refreshing={this.state.refreshing}
 							onRefresh={() => this.callRefreshControl()}
-							title="Pull down to update distances based on your location..."
+							title="Pull down to update distances from your location..."
 							tintColor={theme.lighterOnBackground}
 							titleColor={theme.lighterOnBackground}
 						/>

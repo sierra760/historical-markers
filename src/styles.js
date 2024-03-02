@@ -5,9 +5,19 @@
 import React, { Component, useState } from "react";
 import { StyleSheet } from "react-native";
 
-import { theme } from "./regions";
+import { theme, region } from "./regions";
 
 export const styles = StyleSheet.create({
+	headerTitleStyle: {
+		fontFamily: theme.headerFont,
+		fontSize: 20 * region.headerMultiplier,
+		lineHeight: 20 * region.headerMultiplier * region.headerLineHeightMultiplier,
+		color: theme.contrastOnBackground,
+		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 10,
+		padding: 10
+	},
 	map: { height: "100%" },
 	listTitle: {
 		fontFamily: theme.bodyFont,
@@ -29,23 +39,37 @@ export const styles = StyleSheet.create({
 		paddingTop: 20,
 	},
 	modalHeroFavoriteIconWrapper: {
-		marginBottom: 20
+		marginBottom: 20,
+		marginTop: 10
 	},
 	modalHeroFavoriteIcon: {
 		fontSize: 28,
-		color: theme.contrastOnBackground
+		color: theme.contrastOnBackground,
+		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 5,
+		paddingLeft: 5,
+		marginLeft: -5
 	},
 	modalHeroTitle: {
 		fontFamily: theme.headerFont,
-		fontSize: 28,
+		fontSize: 28 * region.headerMultiplier,
 		color: theme.contrastOnBackground,
 		marginBottom: 10,
+		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 5,
+		paddingLeft: 5,
+		marginLeft: -5
 	},
 	modalHeroLocation: {
 		fontFamily: theme.subheaderFont,
 		color: theme.contrastOnBackground,
 		fontSize: 18,
-		marginLeft: 5
+		paddingLeft: 5,
+		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 5,
 	},
 	modalHeroRow: {
 		flexDirection: "row",
@@ -56,7 +80,10 @@ export const styles = StyleSheet.create({
 		fontFamily: theme.subheaderFont,
 		color: theme.contrastOnBackground,
 		fontSize: 18,
-		marginLeft: 5
+		paddingLeft: 5,
+		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 5
 	},
 	modalMapContainer: {
 		backgroundColor: "white",
@@ -114,6 +141,7 @@ export const styles = StyleSheet.create({
 		lineHeight: 26,
 		color: theme.bodyText,
 		fontFamily: theme.bodyFont,
+		
 	},
 	modalImageSubcaption: {
 		marginBottom: 5,
@@ -141,7 +169,12 @@ export const styles = StyleSheet.create({
 	buttonTitle: {
 		fontFamily: theme.subheaderFont,
 		textTransform: "uppercase",
-		color: theme.lighterOnBackground
+		color: theme.lighterOnBackground,
+		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 5,
+		paddingLeft: 5,
+		marginLeft: -5
 	},
 	modalTextContainer: {
 		padding: 15,
@@ -199,7 +232,10 @@ export const styles = StyleSheet.create({
 	},
 	aboutHeading: {
 		fontWeight: "bold",
-		fontSize: 18,
+		fontSize: 18 * region.headerMultiplier,
+		textShadowColor: 'rgba(0, 0, 0, 0.2)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 5,
 		textAlign: "left",
 		marginTop: 20,
 		textTransform: "uppercase",
@@ -260,7 +296,7 @@ export const styles = StyleSheet.create({
 	},
 	modalTitle: {
 		fontFamily: theme.headerFont,
-		fontSize: 32,
+		fontSize: 32 * region.headerMultiplier,
 		marginBottom: 15,
 	},
 	modalHeading: {

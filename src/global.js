@@ -6,6 +6,7 @@ module.exports = {
 	listScreen: null,
 	mapScreen: null,
 	settingsScreen: null,
+	modalScreen: null,
 	data_clean: null,
 	data: null,
 	filter: null,
@@ -21,5 +22,6 @@ module.exports = {
 	location_permission: null,
 	location: null,
 	location_lastsorted: [-999,-999],
+	location_listener: null,
 	online: null
 };

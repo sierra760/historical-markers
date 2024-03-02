@@ -3,7 +3,7 @@
 // See full license text in file "LICENSE" at root of project directory
 
 import React, { Component, useState } from "react";
-import { DeviceEventEmitter, Appearance } from "react-native";
+import { DeviceEventEmitter, Appearance, AppState, View, Text } from "react-native";
 import {
 	useNavigation,
 	NavigationContainer,
@@ -42,6 +42,7 @@ export default class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			appearanceMode: Appearance.getColorScheme(),
 			fontsLoaded: false,
 			dataLoaded: false,
 			imageSettingsLoaded: false,
@@ -50,19 +51,56 @@ export default class App extends React.Component {
 			deviceOnline: null
 		};
 	}
+	
+	// APP-WIDE DATA FILTERING METHOD
+	filterData = () => {
+		// Apply the filter
+		let filteredData = [];
+		for (i = 0; i < GLOBAL.data_clean.length; i++) {
+			let match = true;
+			// Favorites filter
+			if (GLOBAL.filter.favorites != "all") {
+				if (GLOBAL.favorites.indexOf(GLOBAL.data_clean[i].properties.marker_id) == -1)
+					match = false;
+			}
+			// County filter
+			if (GLOBAL.filter.county != "all") {
+				if (GLOBAL.data_clean[i].properties.county != GLOBAL.filter.county)
+					match = false;
+			}
+			// Search filter
+			if (GLOBAL.filter.search != "") {
+				const titleUpper = GLOBAL.data_clean[i].properties.title_upper;
+				const valueUpper = GLOBAL.filter.search.toUpperCase();
+				if (titleUpper.indexOf(valueUpper) == -1) match = false;
+			}
+			if (match == true) filteredData.push(GLOBAL.data_clean[i]);
+		}
+		if (GLOBAL.location_permission == true && GLOBAL.location != null && GLOBAL.location != false) this.sortByDistance(GLOBAL.location,filteredData);
+		GLOBAL.data = filteredData;
+		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data, refreshing: false});
+		if (GLOBAL.mapScreen != null) GLOBAL.mapScreen.setState({data: GLOBAL.data, region: bboxToRegion(getBbox(GLOBAL.data)), mapCount: GLOBAL.mapScreen.state.mapCount + 1 });
+	};
 
+	// FONT LOADER
 	loadFonts = async () => {
 		await Font.loadAsync({
 			AsapCondensed: require("./assets/fonts/AsapCondensed-Regular.ttf"),
 			EBGaramond: require("./assets/fonts/EBGaramond-VariableFont_wght.ttf"),
-			Rye: require("./assets/fonts/Rye-Regular.ttf"),
-			Pacifico: require("./assets/fonts/Pacifico-Regular.ttf"),
+			Rye: require("./assets/fonts/Rye-Regular.ttf")
 		});
+		if (region.abbr_lower == "az") await Font.loadAsync({ BioRhyme: require("./assets/fonts/BioRhyme-Bold.ttf") });
+		if (region.abbr_lower == "ca") await Font.loadAsync({ Pacifico: require("./assets/fonts/Pacifico-Regular.ttf") });
+		if (region.abbr_lower == "co") await Font.loadAsync({ HoltwoodOne: require("./assets/fonts/HoltwoodOneSC-Regular.ttf") });
+		if (region.abbr_lower == "mt") await Font.loadAsync({ Bevan: require("./assets/fonts/Bevan-Regular.ttf") });
+		if (region.abbr_lower == "nm") await Font.loadAsync({ BigshotOne: require("./assets/fonts/BigshotOne-Regular.ttf") });
+		if (region.abbr_lower == "nv") await Font.loadAsync({ Rye: require("./assets/fonts/Rye-Regular.ttf") });
 		this.setState({
 			fontsLoaded: true,
 		});
 	};
 	
+	// IMAGE DOWNLOAD STATUS LOADER
 	loadImageSettings = async() => {
 		download_images = await AsyncStorage.getItem("download_images");
 		download_images = JSON.parse(download_images);
@@ -76,24 +114,12 @@ export default class App extends React.Component {
 		});
 	}
 
+	// DATA AND FILTER LOADER
 	loadDataAndFilter = async() => {
 		// LOAD LOCATION SETTINGS AND SETUP LOCATION HANDLING
-		let { status } = await Location.requestForegroundPermissionsAsync();
-		if (status == "granted") {
-			// Location permission granted
-			GLOBAL.location_permission = true;
-			const GEOLOCATION_OPTIONS = { accuracy: Location.Accuracy.High, distanceInterval: 100 };
-			Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
-			DeviceEventEmitter.addListener("event.updateLocation", () => {
-				this.updateLocation();
-			});
-		}
-		else {
-			// Location permission not granted
-			GLOBAL.location_permission = false;
-			GLOBAL.data_clean.sort(sortArrayofObjects("title", "asc"));
-			GLOBAL.location = false;
-		}
+		await this.getLocationPermissions();
+		// Trigger method to re-check location permission any time app comes into focused state
+		AppState.addEventListener('change', this.appStateChanged);
 		this.setState({locationPermissionsLoaded: true});
 	
 		// LOAD DATA
@@ -145,41 +171,97 @@ export default class App extends React.Component {
 			this.filterData();
 		});
 		if (GLOBAL.location_permission == true) await this.updateLocation();
+		else GLOBAL.data.sort(sortArrayofObjects("title", "asc"));
 		this.setState({
 			dataLoaded: true,
 			filterLoaded: true
 		});
 	};
 
-	filterData = () => {
-		// Apply the filter
-		let filteredData = [];
-		for (i = 0; i < GLOBAL.data_clean.length; i++) {
-			let match = true;
-			// Favorites filter
-			if (GLOBAL.filter.favorites != "all") {
-				if (GLOBAL.favorites.indexOf(GLOBAL.data_clean[i].properties.marker_id) == -1)
-					match = false;
-			}
-			// County filter
-			if (GLOBAL.filter.county != "all") {
-				if (GLOBAL.data_clean[i].properties.county != GLOBAL.filter.county)
-					match = false;
-			}
-			// Search filter
-			if (GLOBAL.filter.search != "") {
-				const titleUpper = GLOBAL.data_clean[i].properties.title_upper;
-				const valueUpper = GLOBAL.filter.search.toUpperCase();
-				if (titleUpper.indexOf(valueUpper) == -1) match = false;
-			}
-			if (match == true) filteredData.push(GLOBAL.data_clean[i]);
-		}
-		if (GLOBAL.location_permission == true && GLOBAL.location != null && GLOBAL.location != false) this.sortByDistance(GLOBAL.location,filteredData);
-		GLOBAL.data = filteredData;
-		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data, refreshing: false});
-		if (GLOBAL.mapScreen != null) GLOBAL.mapScreen.setState({data: GLOBAL.data, region: bboxToRegion(getBbox(GLOBAL.data)), mapCount: GLOBAL.mapScreen.state.mapCount + 1 });
+	// DEVICE CONNECTIVITY HANDLER
+	loadConnectivity = () => {
+		NetInfo.addEventListener((state) => {
+			if (state.isConnected == true) GLOBAL.online = true;
+			else GLOBAL.online = false;
+			this.setState({
+				deviceOnline: GLOBAL.online,
+			});
+			if (GLOBAL.settingsScreen != null) GLOBAL.settingsScreen.setState({deviceOnline: GLOBAL.online})
+		});
 	};
-
+	
+	// DEVICE LOCATION HANDLERS
+	// Check location permissions and refresh location if changed
+	getLocationPermissions = async() => {
+		let { status } = await Location.requestForegroundPermissionsAsync();
+		updated_location_permission = (status === 'granted');
+		// Only handle if location permissions have not yet been set or have been changed
+		if (GLOBAL.location_permission != updated_location_permission) {
+			if (status == "granted") {
+				// Location permission granted
+				GLOBAL.location_permission = true;
+				const GEOLOCATION_OPTIONS = { accuracy: Location.Accuracy.High, distanceInterval: 100 };
+				Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+				GLOBAL.location_listener = DeviceEventEmitter.addListener("event.updateLocation", () => {
+					this.updateLocation();
+				});
+			}
+			else {
+				// Location permission not granted
+				GLOBAL.location_permission = false;
+				GLOBAL.location = false;
+				if (GLOBAL.location_listener != null) {
+					GLOBAL.location_listener.remove();
+					GLOBAL.location_listener = null;
+					GLOBAL.data.sort(sortArrayofObjects("title", "asc"));
+					if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data});
+				}
+			}
+		}
+	}
+	// Facilitates location on launch and manual location updates (refresh pulldown)
+	updateLocation = async() => {
+		if (GLOBAL.location_permission == true) {
+			if (GLOBAL.location == null)
+				loc = await Location.getLastKnownPositionAsync();
+			else
+				loc = await Location.getCurrentPositionAsync();
+			this.locationChanged(loc);
+		}
+	}
+	// Called after location update is available
+	locationChanged = (loc) => {
+		GLOBAL.location = [loc.coords.longitude, loc.coords.latitude];
+		// Sort data only once available, and sort by distance only if the current location is actually different from the last time data were sorted
+		if (GLOBAL.data != null && (GLOBAL.location_lastsorted[0] != GLOBAL.location[0] && GLOBAL.location_lastsorted[1] != GLOBAL.location[1]))  {
+			GLOBAL.location_lastsorted = GLOBAL.location;
+			GLOBAL.data = this.sortByDistance([loc.coords.longitude,loc.coords.latitude],GLOBAL.data);
+			if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data});
+		}
+		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({refreshing: false});
+	}
+	// Utility for calculating distances to markers and sorting marker list by distance
+	sortByDistance = (loc, data) => {
+		data.forEach((feature) => {
+			let {d, b, bv} = haversine(
+				[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
+				[loc[0], loc[1]]
+			);
+			feature.properties.distance = d;
+			feature.properties.bearing = b;
+			feature.properties.bearing_verbose = bv;
+		});
+		data.sort(sortArrayofObjects("distance", "asc"));
+		return data;
+	}
+	// Listener to handle changes in location permissions
+	appStateChanged = async() => {
+		if (AppState.currentState == "active") {
+			await this.getLocationPermissions();
+		}
+	};
+	
+	// USER INTERFACE COMPONENTS
 	HomeTabs = () => {
 		return (
 			<Tab.Navigator
@@ -206,7 +288,7 @@ export default class App extends React.Component {
 							tabBarIcon: ({ color, size }) => (
 								<Ionicons name="map" color={color} size={size} />
 							),
-							lazy: false
+							lazy: true
 						}}
 					/>
 				) : null}
@@ -227,59 +309,23 @@ export default class App extends React.Component {
 			</Tab.Navigator>
 		);
 	};
-
-	loadConnectivity = () => {
-		NetInfo.addEventListener((state) => {
-			if (state.isConnected == true) GLOBAL.online = true;
-			else GLOBAL.online = false;
-			this.setState({
-				deviceOnline: GLOBAL.online,
-			});
-			if (GLOBAL.settingsScreen != null) GLOBAL.settingsScreen.setState({deviceOnline: GLOBAL.online})
-		});
+	ScreenTitle = (props) => {
+		return(
+			<View>
+				<Text style={styles.headerTitleStyle}>{props.children}</Text>
+			</View>
+		);
 	};
 	
-	locationChanged = (loc) => {
-		GLOBAL.location = [loc.coords.longitude, loc.coords.latitude];
-		// Sort data only once available, and sort by distance only if the current location is actually different from the last time data were sorted
-		if (GLOBAL.data != null && (GLOBAL.location_lastsorted[0] != GLOBAL.location[0] && GLOBAL.location_lastsorted[1] != GLOBAL.location[1]))  {
-			GLOBAL.location_lastsorted = GLOBAL.location;
-			GLOBAL.data = this.sortByDistance([loc.coords.longitude,loc.coords.latitude],GLOBAL.data);
-			if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({data: GLOBAL.data});
-		}
-		if (GLOBAL.listScreen != null) GLOBAL.listScreen.setState({refreshing: false});
-	}
-	
-	sortByDistance = (loc, data) => {
-		data.forEach((feature) => {
-			let {d, b, bv} = haversine(
-				[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-				[loc[0], loc[1]]
-			);
-			feature.properties.distance = d;
-			feature.properties.bearing = b;
-			feature.properties.bearing_verbose = bv;
-		});
-		data.sort(sortArrayofObjects("distance", "asc"));
-		return data;
-	}
-	
-	// Facilitates location on launch and manual location updates (refresh pulldown)
-	updateLocation = async() => {
-		if (GLOBAL.location == null)
-			loc = await Location.getLastKnownPositionAsync();
-		else
-			loc = await Location.getCurrentPositionAsync();
-		this.locationChanged(loc);
-	}
-
+	// LOAD ALL CORE SETTINGS AND DATA BEFORE RENDERING
 	componentDidMount() {
 		this.loadConnectivity();
 		this.loadFonts();
 		this.loadImageSettings();
 		this.loadDataAndFilter();
 	}
-
+	
+	// PRIMARY APP RENDERING METHOD
 	render() {
 		if (
 			this.state.fontsLoaded &&
@@ -295,10 +341,7 @@ export default class App extends React.Component {
 					backgroundColor: theme.primaryBackground,
 				},
 				headerTintColor: theme.contrastOnBackground,
-				headerTitleStyle: {
-					fontFamily: theme.headerFont,
-					fontSize: 20,
-				},
+			
 				headerBackTitle: "Back",
 				headerBackTitleStyle: {
 					fontFamily: theme.headerFont
@@ -314,7 +357,10 @@ export default class App extends React.Component {
 						<RootStack.Screen
 							name={`${region.name} Historical Markers`}
 							component={this.HomeTabs}
-							options={headerStyles}
+							options={{
+								headerStyle: {backgroundColor: theme.primaryBackground},
+								headerTitle: (props) => <this.ScreenTitle {...props} />
+							}}
 						/>
 						<RootStack.Screen
 							name="MarkerDetailView"
