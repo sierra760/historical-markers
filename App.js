@@ -222,10 +222,13 @@ export default class App extends React.Component {
 	// Facilitates location on launch and manual location updates (refresh pulldown)
 	updateLocation = async() => {
 		if (GLOBAL.location_permission == true) {
-			if (GLOBAL.location == null)
-				loc = await Location.getLastKnownPositionAsync();
-			else
-				loc = await Location.getCurrentPositionAsync();
+			if (GLOBAL.location == null) loc = await Location.getLastKnownPositionAsync();
+			// Prevent app from waiting on a current position fix by loading the last known position until the list view renders for the first time
+			else if (GLOBAL.listScreen != null) {
+				if (GLOBAL.listScreen.state.initialized == false) loc = await Location.getLastKnownPositionAsync();
+				else loc = await Location.getCurrentPositionAsync();
+			}
+			else loc = await Location.getLastKnownPositionAsync();
 			this.locationChanged(loc);
 		}
 	}

@@ -28,7 +28,7 @@ export default class MarkerListView extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			error: null,
+			initialized: false,
 			refreshing: false,
 			data: GLOBAL.data,
 		};
@@ -36,6 +36,7 @@ export default class MarkerListView extends Component {
 	}
 	
 	componentDidMount = () => {
+		this.setState({initialized: true});
 		SplashScreen.hideAsync();
 	}
 
