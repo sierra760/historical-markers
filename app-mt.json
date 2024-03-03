@@ -40,6 +40,17 @@
     },
     "plugins": [
       [
+      "@viro-community/react-viro",
+		{
+		"ios": {
+			"cameraUsagePermission": "$(PRODUCT_NAME) uses your camera to allow you to experience historical markers using augmented reality (AR).  This permission is only required to use this app's AR mode.",
+			"microphoneUsagePermission": "$(PRODUCT_NAME) uses your microphone to allow you to experience historical markers using augmented reality (AR).  This permission is only required to use this app's AR mode.",
+			"photosPermission": "$(PRODUCT_NAME) would like to read photos to allow you to experience historical markers using augmented reality (AR).  This permission is only required to use this app's AR mode.",
+			"savephotosPermission": "$(PRODUCT_NAME) would like to save photos to your library to allow you to experience historical markers using augmented reality (AR).  This permission is only required to use this app's AR mode."
+			}
+		}
+	  ],
+      [
         "expo-location",
         {
           "locationWhenInUsePermission": "If you allow Montana Historical Markers to use your location while the app is running, your location will be used to sort the list of historical markers so that the markers nearest you are shown first.",

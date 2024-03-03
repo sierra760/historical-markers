@@ -26,6 +26,7 @@ import MarkerListView from "./src/MarkerListView";
 import MarkerMapView from "./src/MarkerMapView";
 import MarkerDetailView from "./src/MarkerDetailView";
 import MarkerFilterHeader from "./src/MarkerFilterHeader";
+import ARView from "./src/ARView";
 import { styles } from "./src/styles";
 import { importAll, haversine, sortArrayofObjects, getBbox, bboxToRegion } from "./src/utils";
 
@@ -295,6 +296,16 @@ export default class App extends React.Component {
 						}}
 					/>
 				) : null}
+				<Tab.Screen
+					name="AR"
+					component={ARView}
+					options={{
+						tabBarIcon: ({ color, size }) => (
+							<Ionicons name="camera" color={color} size={size} />
+						),
+						lazy: true
+					}}
+				/>
 				<Tab.Screen
 					name="Settings"
 					component={SettingsView}
