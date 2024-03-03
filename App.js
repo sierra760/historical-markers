@@ -91,7 +91,7 @@ export default class App extends React.Component {
 		});
 		if (region.abbr_lower == "az") await Font.loadAsync({ BioRhyme: require("./assets/fonts/BioRhyme-Bold.ttf") });
 		if (region.abbr_lower == "ca") await Font.loadAsync({ Pacifico: require("./assets/fonts/Pacifico-Regular.ttf") });
-		if (region.abbr_lower == "co") await Font.loadAsync({ HoltwoodOne: require("./assets/fonts/HoltwoodOneSC-Regular.ttf") });
+		if (region.abbr_lower == "co") await Font.loadAsync({ Ultra: require("./assets/fonts/Ultra-Regular.ttf") });
 		if (region.abbr_lower == "mt") await Font.loadAsync({ Bevan: require("./assets/fonts/Bevan-Regular.ttf") });
 		if (region.abbr_lower == "nm") await Font.loadAsync({ BigshotOne: require("./assets/fonts/BigshotOne-Regular.ttf") });
 		if (region.abbr_lower == "nv") await Font.loadAsync({ Rye: require("./assets/fonts/Rye-Regular.ttf") });

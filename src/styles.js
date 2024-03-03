@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
 		fontSize: 20 * region.headerMultiplier,
 		lineHeight: 20 * region.headerMultiplier * region.headerLineHeightMultiplier,
 		color: theme.contrastOnBackground,
-		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowColor: 'rgba(0, 0, 0, 0.65)',
 		textShadowOffset: {width: -1, height: 1},
 		textShadowRadius: 10,
 		padding: 10
@@ -169,12 +169,7 @@ export const styles = StyleSheet.create({
 	buttonTitle: {
 		fontFamily: theme.subheaderFont,
 		textTransform: "uppercase",
-		color: theme.lighterOnBackground,
-		textShadowColor: 'rgba(0, 0, 0, 0.5)',
-		textShadowOffset: {width: -1, height: 1},
-		textShadowRadius: 5,
-		paddingLeft: 5,
-		marginLeft: -5
+		color: theme.lighterOnBackground
 	},
 	modalTextContainer: {
 		padding: 15,
@@ -200,6 +195,13 @@ export const styles = StyleSheet.create({
 		lineHeight: 26,
 		color: theme.bodyText,
 		fontFamily: theme.bodyFont,
+	},
+	modalIconWithShadow: {
+		textShadowColor: 'rgba(0, 0, 0, 0.5)',
+		textShadowOffset: {width: -1, height: 1},
+		textShadowRadius: 5,
+		paddingLeft: 5,
+		marginLeft: -5,
 	},
 	modalLink: {
 		textAlign: "left",

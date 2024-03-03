@@ -176,7 +176,7 @@ export default class MarkerDetailView extends Component {
 								{this.props.route.params.properties.title}
 							</Text>	
 							<View style={styles.modalHeroRow}>
-								<Ionicons name="location-outline" color={styles.modalHeroLocation.color} size={styles.modalHeroLocation.fontSize} />
+								<Ionicons name="location-outline" color={styles.modalHeroLocation.color} size={styles.modalHeroLocation.fontSize} style={styles.modalIconWithShadow} />
 								{this.props.route.params.properties.city ? (
 									<Text style={styles.modalHeroLocation}>
 										{this.props.route.params.properties.city},{" "}
@@ -189,10 +189,10 @@ export default class MarkerDetailView extends Component {
 								)}
 							</View>
 							<View style={styles.modalHeroRow}>
-								{this.props.route.params.properties.distance ? (
-									<Ionicons name="compass-outline" color={styles.modalHeroLocation.color} size={styles.modalHeroLocation.fontSize} />
+								{this.props.route.params.properties.distance && GLOBAL.location_permission ? (
+									<Ionicons name="compass-outline" color={styles.modalHeroLocation.color} size={styles.modalHeroLocation.fontSize}  style={styles.modalIconWithShadow}/>
 								) : null }
-								{this.props.route.params.properties.distance ? (
+								{this.props.route.params.properties.distance && GLOBAL.location_permission ? (
 									<Text style={styles.modalHeroDistance}>
 										{capitalizeFirstLetter(formatDistance(this.props.route.params.properties.distance))} to your {this.props.route.params.properties.bearing_verbose}
 									</Text>
@@ -234,7 +234,7 @@ export default class MarkerDetailView extends Component {
 								icon={{
 									name: "directions",
 									size: 20,
-									color: theme.lighterOnBackground,
+									color: theme.lighterOnBackground
 								}}
 								title="View in Maps"
 								onPress={() =>
@@ -265,9 +265,7 @@ export default class MarkerDetailView extends Component {
 							/>
 						</View>
 					</View>
-					{GLOBAL.online == false ? (
-						<View style={styles.modalSpacer}></View>
-					) : null }
+					<View style={styles.modalSpacer}></View>
 					<View style={styles.modalTextContainer}>
 						<Text style={styles.modalHeading}>Description</Text>
 						<Text style={styles.modalText}>
@@ -336,7 +334,7 @@ export default class MarkerDetailView extends Component {
 						<View style={styles.modalImageContainer}>
 							{this.props.route.params.properties.photos.map(
 								(photo, i) => (
-									<TouchableHighlight onPress={() => this.showLightbox(i)} underlayColor={"none"}>
+									<TouchableHighlight key={photo.filename} onPress={() => this.showLightbox(i)} underlayColor={"none"}>
 										<View style={styles.modalImageBox}>
 											<View
 												style={{
