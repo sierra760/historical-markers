@@ -7,6 +7,7 @@ module.exports = {
 	mapScreen: null,
 	settingsScreen: null,
 	modalScreen: null,
+	arScreen: null,
 	data_clean: null,
 	data: null,
 	filter: null,
