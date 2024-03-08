@@ -2,7 +2,7 @@
 // License: GNU General Public License version 3 (GPLv3)
 // See full license text in file "LICENSE" at root of project directory
 
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import { DeviceEventEmitter, Appearance, AppState, View, Text } from "react-native";
 import {
 	useNavigation,

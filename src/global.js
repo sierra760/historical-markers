@@ -6,6 +6,7 @@ module.exports = {
 	listScreen: null,
 	mapScreen: null,
 	settingsScreen: null,
+	arScreen: null,
 	modalScreen: null,
 	data_clean: null,
 	data: null,
