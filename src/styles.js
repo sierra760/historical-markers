@@ -381,6 +381,13 @@ export const styles = StyleSheet.create({
 	listNonfavorite: {
 		backgroundColor: theme.listBackground,
 	},
+	helloWorldTextStyle: {
+		fontFamily: "Arial",
+		fontSize: 30,
+		color: "#ffffff",
+		textAlignVertical: "center",
+		textAlign: "center",
+	},
 });
 
 export const filterSelectStyles = StyleSheet.create({

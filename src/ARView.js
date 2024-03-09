@@ -14,10 +14,13 @@ import {
 } from "@viro-community/react-viro";
 import React, { Component, setState } from "react";
 import {
-	StyleSheet
+	StyleSheet, View
 } from "react-native";
 import CompassHeading from 'react-native-compass-heading';
 import * as Location from "expo-location";
+
+import MarkerFilterHeader from "./MarkerFilterHeader";
+import { styles } from "./styles";
 
 import { region, theme } from "./regions";
 import GLOBAL from './global.js';
@@ -30,10 +33,10 @@ class MarkerARScene extends Component {
 		this.utmConverter = new utmObj(),
 		this.distanceThreshold = 1000,
 		this.state = {
-			demoText: 'Initializing AR...',
 			data: [],
 			heading: null,
-			location: null
+			location: null,
+			device_utm: null
 		};
 	}
 	
@@ -45,10 +48,9 @@ class MarkerARScene extends Component {
 		return Math.sqrt(a*a + b*b);
 	}
 	// Calculate marker coordinates for scene from device and marker UTM coords
-	utmToSceneCoords = (device_utm, marker_utm) => {
-		console.log("utm inputs", device_utm, marker_utm);
-		dY = marker_utm.Northing - device_utm.Northing;
-		dX = marker_utm.Easting - device_utm.Easting;
+	utmToSceneCoords = (loc1, loc2) => {
+		dY = loc2.Northing - loc1.Northing;
+		dX = loc2.Easting - loc1.Easting;
 		return { x: dX, z: -dY };
 	}
 	
@@ -66,9 +68,11 @@ class MarkerARScene extends Component {
 	// AR Scene initialized callback
 	onSceneInitialized = (state: any, reason: ViroTrackingReason) => {
 		if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-			this.setState({demoText: "Howdy pardner!"});
-		} else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
+			// Tracking is working fine
+		}
+		else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
 			// Handle loss of tracking
+			console.log("No AR tracking");
 		}
 	}
 	
@@ -92,15 +96,16 @@ class MarkerARScene extends Component {
 				nearbyMarkers[i].properties["distance_ar"] = this.utmDistance([device_utm.Easting, device_utm.Northing], [marker_utm.Easting, marker_utm.Northing]);
 			}
 		}
-		this.setState({data: nearbyMarkers, location: loc}, this.placeMarkers(device_utm));
+		this.setState({data: nearbyMarkers, location: loc, device_utm: device_utm}, this.placeMarkers());
 	}
 	
 	// Called to place markers after location is ready
-	placeMarkers = (device_utm) => {
-		if(this.state.data.length == 0) return undefined;
+	placeMarkers = () => {
+		if (this.state.data.length == 0 || this.state.device_utm == null) return undefined;
 		const ARMarkers = this.state.data.map((feature) => {
-		  const coords = this.utmToSceneCoords(device_utm, feature.properties.marker_utm);
+		  const coords = this.utmToSceneCoords(this.state.device_utm, feature.properties.marker_utm);
 		  const scale = Math.abs(Math.round(coords.z/15));
+		  console.log("placing marker",feature.properties.title,coords,scale);
 		  return (
 			<ViroNode key={feature.properties.marker_id} scale={[scale, scale, scale]} rotation={[0, 0, 0]} position={[coords.x, 0, coords.z]}>
 			  <ViroFlexView style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -114,38 +119,31 @@ class MarkerARScene extends Component {
 	}
 	
 	render() {
-		return ( 
-			<ViroARScene onTrackingUpdated={this.onSceneInitialized} >
-				{(this.state.location != null) && this.placeMarkers()}
-			</ViroARScene>
-		);
+		if (this.state.location != null) {
+			return ( 
+				<ViroARScene onTrackingUpdated={this.onSceneInitialized} >
+					{(this.state.device_utm != null && this.state.data.length > 0) && this.placeMarkers()}
+				</ViroARScene>
+			);
+		}
 	}
 };
 
 export default class ARView extends Component {
 	render() {
 		return ( 
-			<ViroARSceneNavigator autofocus = {true}
-				initialScene = {
-					{
-						scene: MarkerARScene,
-					}
-				}
-				style = {styles.f1}
-			/>
+			<View style={{ flex: 1 }}>
+				<View>
+					<MarkerFilterHeader />
+				</View>
+				<ViroARSceneNavigator
+					worldAlignment = {'GravityAndHeading'}
+					autofocus = {true}
+					initialScene = {{ scene: MarkerARScene }}
+					style = {{flex: 1}}
+					debug={false}
+				/>
+			</View>
 		);
 	}
 };
-
-var styles = StyleSheet.create({
-	f1: {
-		flex: 1
-	},
-	helloWorldTextStyle: {
-		fontFamily: "Arial",
-		fontSize: 30,
-		color: "#ffffff",
-		textAlignVertical: "center",
-		textAlign: "center",
-	},
-});
