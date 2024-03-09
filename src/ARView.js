@@ -13,9 +13,7 @@ import {
 	ViroTrackingStateConstants,
 } from "@viro-community/react-viro";
 import React, { Component, setState } from "react";
-import {
-	StyleSheet, View
-} from "react-native";
+import { View } from "react-native";
 import CompassHeading from 'react-native-compass-heading';
 import * as Location from "expo-location";
 
@@ -31,6 +29,7 @@ class MarkerARScene extends Component {
 	constructor(props) {
 		super(props);
 		this.utmConverter = new utmObj(),
+		this.locationListener = null,
 		this.distanceThreshold = 1000,
 		this.state = {
 			data: [],
@@ -49,20 +48,28 @@ class MarkerARScene extends Component {
 	}
 	// Calculate marker coordinates for scene from device and marker UTM coords
 	utmToSceneCoords = (loc1, loc2) => {
-		dY = loc2.Northing - loc1.Northing;
 		dX = loc2.Easting - loc1.Easting;
+		dY = loc2.Northing - loc1.Northing;
+// 		h = (this.state.heading.heading * Math.PI) / 180;
+// 		dX = dX * Math.cos(h) - dY * Math.sin(h);
+// 		dY = dX * Math.sin(h) - dY * Math.cos(h);
+// 		console.log(dY, dX, h);
 		return { x: dX, z: -dY };
 	}
 	
-	// On-load logic for AR view
-	componentDidMount = () => {
+	// On-load and on-unfocus logic for AR view
+	componentDidMount = async() => {
 		// Initialize location tracking
-		const GEOLOCATION_OPTIONS = { accuracy: Location.Accuracy.High };
-		Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+		const GEOLOCATION_OPTIONS = { accuracy: Location.Accuracy.High, distanceInterval: 10 };
+		this.locationListener = await Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
 		// Initialize compass heading tracking
 		CompassHeading.start(3, (heading) => {
 		  this.setState({heading: heading});
 		});
+	}
+	componentWillUnmount = () => {
+		CompassHeading.stop();
+		this.locationListener.remove();
 	}
 	
 	// AR Scene initialized callback
@@ -96,22 +103,20 @@ class MarkerARScene extends Component {
 				nearbyMarkers[i].properties["distance_ar"] = this.utmDistance([device_utm.Easting, device_utm.Northing], [marker_utm.Easting, marker_utm.Northing]);
 			}
 		}
-		this.setState({data: nearbyMarkers, location: loc, device_utm: device_utm}, this.placeMarkers());
+		this.setState({data: nearbyMarkers, location: loc, device_utm: device_utm});
 	}
 	
 	// Called to place markers after location is ready
 	placeMarkers = () => {
-		if (this.state.data.length == 0 || this.state.device_utm == null) return undefined;
+		if (this.state.data.length == 0 || this.state.device_utm == null || this.state.heading == null) return undefined;
 		const ARMarkers = this.state.data.map((feature) => {
 		  const coords = this.utmToSceneCoords(this.state.device_utm, feature.properties.marker_utm);
-		  const scale = Math.abs(Math.round(coords.z/15));
-		  console.log("placing marker",feature.properties.title,coords,scale);
+		  const scale = Math.abs(Math.round(coords.z/7.5));
 		  return (
 			<ViroNode key={feature.properties.marker_id} scale={[scale, scale, scale]} rotation={[0, 0, 0]} position={[coords.x, 0, coords.z]}>
-			  <ViroFlexView style={{alignItems: 'center', justifyContent: 'center'}}>
 				<ViroText width={4} height={0.5} text={feature.properties.title} style={styles.helloWorldTextStyle} />
 				<ViroText width={4} height={0.5} text={`${Number(feature.properties.distance_ar).toFixed(2)} m`} style={styles.helloWorldTextStyle} position={[0, -0.75, 0]}/>
-			  </ViroFlexView>
+				<ViroImage width={1} height={1} source={{uri: 'https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-1024.png'}} position={[0,-1.5,0]}/>
 			</ViroNode>
 		  )
 		});
@@ -122,7 +127,7 @@ class MarkerARScene extends Component {
 		if (this.state.location != null) {
 			return ( 
 				<ViroARScene onTrackingUpdated={this.onSceneInitialized} >
-					{(this.state.device_utm != null && this.state.data.length > 0) && this.placeMarkers()}
+					{this.placeMarkers()}
 				</ViroARScene>
 			);
 		}
@@ -141,7 +146,6 @@ export default class ARView extends Component {
 					autofocus = {true}
 					initialScene = {{ scene: MarkerARScene }}
 					style = {{flex: 1}}
-					debug={false}
 				/>
 			</View>
 		);

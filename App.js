@@ -303,7 +303,8 @@ export default class App extends React.Component {
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons name="camera" color={color} size={size} />
 						),
-						lazy: true
+						lazy: true,
+						unmountOnBlur: true
 					}}
 				/>
 				<Tab.Screen
